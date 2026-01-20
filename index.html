@@ -4066,6 +4066,11 @@
 
                             <!-- Menú de Acciones -->
                             <nav class="space-y-2">
+                                <button onclick="Router.switchTab('profile')" class="w-full text-left px-4 py-3 rounded-xl text-slate-600 hover:bg-tec-gold/10 hover:text-tec-gold font-bold text-xs flex items-center gap-3 transition group">
+                                    <div class="p-1 bg-tec-gold/20 text-tec-gold rounded group-hover:scale-110 transition"><i data-lucide="user-cog" class="w-3 h-3"></i></div>
+                                    <span>Mi Perfil</span>
+                                </button>
+                                
                                 <button onclick="Router.switchTab('overview')" class="w-full text-left px-4 py-3 rounded-xl bg-blue-50 text-tec-blue font-bold text-xs flex items-center gap-3 transition">
                                     <i data-lucide="layout-grid" class="w-4 h-4"></i> Panel General
                                 </button>
@@ -4335,6 +4340,24 @@
                                 <!-- Se carga dinámicamente con Achievements.renderDashboardSection() -->
                             </div>
 
+                        </div>
+
+                        <!-- TAB: MI PERFIL -->
+                        <div id="tab-profile" class="hidden flex flex-col gap-6">
+                            <!-- Header del Perfil -->
+                            <div class="bg-gradient-to-r from-tec-gold via-yellow-500 to-orange-500 rounded-2xl p-6 sm:p-8 text-white relative overflow-hidden shadow-lg">
+                                <div class="relative z-10">
+                                    <h2 class="text-xl sm:text-2xl font-bold mb-2 flex items-center gap-3">
+                                        <i data-lucide="user-cog" class="w-6 h-6 sm:w-8 sm:h-8"></i>
+                                        Mi Perfil
+                                    </h2>
+                                    <p class="text-yellow-100 text-xs max-w-lg">Configura tu información pública, foto de perfil, área de especialización y habilidades.</p>
+                                </div>
+                                <div class="absolute right-0 bottom-0 opacity-10">
+                                    <i data-lucide="user" class="w-40 h-40 transform translate-x-10 translate-y-10"></i>
+                                </div>
+                            </div>
+                            
                             <!-- Perfil y datos del miembro -->
                             <div class="bg-white rounded-2xl shadow-enterprise border border-slate-200 p-6">
                                 <div class="flex items-center justify-between mb-6">
