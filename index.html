@@ -4142,6 +4142,12 @@
                                     <span>Solicitudes</span>
                                     <span class="ml-auto text-[9px] bg-amber-500 text-white px-1.5 py-0.5 rounded-full font-black" id="pending-applications-count">0</span>
                                 </button>
+                                
+                                <!-- BOTÓN GESTIÓN DE MIEMBROS (Solo visible para admin/fundador) -->
+                                <button id="btn-admin-members" onclick="Router.navigate('admin-members')" class="w-full text-left px-4 py-3 rounded-xl text-slate-600 hover:bg-red-50 hover:text-red-700 font-bold text-xs flex items-center gap-3 transition group hidden">
+                                    <div class="p-1 bg-red-100 text-red-600 rounded group-hover:scale-110 transition"><i data-lucide="users-cog" class="w-3 h-3"></i></div>
+                                    <span>Gestión de Miembros</span>
+                                </button>
                             </nav>
 
                             <div class="mt-8 pt-6 border-t border-slate-100">
@@ -4702,6 +4708,75 @@
                         <i data-lucide="folder-open" class="w-16 h-16 text-slate-300 mx-auto mb-4"></i>
                         <p class="text-slate-400">Cargando recursos...</p>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==============================
+             VISTA: GESTIÓN DE MIEMBROS (ADMIN)
+             ============================== -->
+        <section id="view-admin-members" class="view-section hidden min-h-screen bg-slate-50">
+            <!-- Hero -->
+            <div class="relative bg-gradient-to-br from-red-600 via-red-700 to-rose-800 py-16 overflow-hidden">
+                <div class="absolute inset-0">
+                    <div class="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
+                </div>
+                <div class="container mx-auto px-6 relative z-10">
+                    <div class="max-w-4xl mx-auto text-center">
+                        <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur rounded-full text-white text-xs font-bold mb-4">
+                            <i data-lucide="shield" class="w-4 h-4"></i>
+                            Panel de Administración
+                        </div>
+                        <h1 class="text-3xl sm:text-4xl font-black text-white mb-4">Gestión de Miembros</h1>
+                        <p class="text-red-100 text-sm max-w-xl mx-auto">Administra las cuentas de los miembros del club. Puedes editar información o eliminar cuentas.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenido -->
+            <div class="container mx-auto px-6 py-8">
+                <!-- Barra de búsqueda y estadísticas -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
+                    <div class="flex flex-col sm:flex-row gap-4 items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
+                                <i data-lucide="users" class="w-6 h-6 text-red-600"></i>
+                            </div>
+                            <div>
+                                <p class="text-2xl font-black text-slate-800" id="admin-members-count">0</p>
+                                <p class="text-xs text-slate-500 uppercase font-bold">Miembros Registrados</p>
+                            </div>
+                        </div>
+                        <div class="flex-1 max-w-md">
+                            <div class="relative">
+                                <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                <input type="text" id="admin-members-search" placeholder="Buscar por nombre, email o carrera..." 
+                                    class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:border-red-500 focus:ring-2 focus:ring-red-500/20 outline-none transition"
+                                    onkeyup="AdminMembers.search(this.value)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista de miembros -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="p-4 border-b border-slate-200 bg-slate-50">
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider">Lista de Miembros</p>
+                    </div>
+                    <div id="admin-members-list" class="divide-y divide-slate-100">
+                        <div class="p-8 text-center">
+                            <div class="animate-spin w-8 h-8 border-4 border-red-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+                            <p class="text-slate-400 text-sm">Cargando miembros...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botón volver -->
+                <div class="mt-6 text-center">
+                    <button onclick="Router.to('dashboard')" class="inline-flex items-center gap-2 px-6 py-3 bg-slate-200 text-slate-700 rounded-xl font-bold text-sm hover:bg-slate-300 transition">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                        Volver al Dashboard
+                    </button>
                 </div>
             </div>
         </section>
@@ -7520,6 +7595,9 @@
                     
                     // Inicializar sistema de solicitudes (solo para fundadores/líderes/maestros)
                     setTimeout(() => Applications.init(), 600);
+                    
+                    // Inicializar gestión de miembros (solo para admin/fundador)
+                    setTimeout(() => AdminMembers.init(), 700);
 
                 } else {
                     uiPublic?.classList.remove('hidden');
@@ -11093,6 +11171,7 @@
                     if(view === 'tasks') Tasks.load();
                     if(view === 'calendar') Calendar.load();
                     if(view === 'communications') Communications.load();
+                    if(view === 'admin-members') AdminMembers.load();
                 }
                 
                 window.scrollTo(0, 0);
@@ -12284,6 +12363,328 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeri
                     Util.loading(false);
                     console.error('Error enviando solicitud de patrocinio:', error);
                     Util.notify('Error al enviar la solicitud. Intenta de nuevo.', 'error');
+                }
+            }
+        };
+
+        /**
+         * ==========================================
+         * ADMIN MEMBERS (Gestión de Miembros - Admin)
+         * Solo visible para Admins y Fundadores
+         * ==========================================
+         */
+        const AdminMembers = {
+            allMembers: [],
+            filteredMembers: [],
+            
+            // Verificar si el usuario tiene permisos
+            hasAccess: () => {
+                if (!STATE.currentUser || !STATE.profile) return false;
+                
+                const title = (STATE.profile.customTitle || '').toLowerCase();
+                const role = (STATE.profile.role || '').toLowerCase();
+                const SUPER_ADMIN_EMAIL = 'a23490819@itmexicali.edu.mx';
+                
+                const isFounder = title.includes('fundador') || title.includes('founder');
+                const isAdmin = role === 'admin' || STATE.currentUser.email === SUPER_ADMIN_EMAIL;
+                
+                return isFounder || isAdmin;
+            },
+            
+            // Inicializar y mostrar botón si tiene acceso
+            init: () => {
+                const btn = document.getElementById('btn-admin-members');
+                if (!btn) return;
+                
+                if (AdminMembers.hasAccess()) {
+                    btn.classList.remove('hidden');
+                } else {
+                    btn.classList.add('hidden');
+                }
+            },
+            
+            // Cargar todos los miembros
+            load: async () => {
+                if (!AdminMembers.hasAccess()) {
+                    Util.notify('No tienes permisos para acceder a esta sección', 'error');
+                    Router.to('dashboard');
+                    return;
+                }
+                
+                const container = document.getElementById('admin-members-list');
+                const countEl = document.getElementById('admin-members-count');
+                
+                if (!container) return;
+                
+                container.innerHTML = `
+                    <div class="p-8 text-center">
+                        <div class="animate-spin w-8 h-8 border-4 border-red-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+                        <p class="text-slate-400 text-sm">Cargando miembros...</p>
+                    </div>
+                `;
+                
+                try {
+                    const snap = await db.collection('users').orderBy('fullName').get();
+                    
+                    AdminMembers.allMembers = [];
+                    snap.forEach(doc => {
+                        AdminMembers.allMembers.push({
+                            id: doc.id,
+                            ...doc.data()
+                        });
+                    });
+                    
+                    AdminMembers.filteredMembers = [...AdminMembers.allMembers];
+                    
+                    if (countEl) countEl.textContent = AdminMembers.allMembers.length;
+                    
+                    AdminMembers.render();
+                    
+                } catch (err) {
+                    console.error('Error cargando miembros:', err);
+                    container.innerHTML = `
+                        <div class="p-8 text-center">
+                            <i data-lucide="alert-circle" class="w-12 h-12 text-red-300 mx-auto mb-4"></i>
+                            <p class="text-red-500 font-bold">Error al cargar miembros</p>
+                            <p class="text-sm text-slate-400">${err.message}</p>
+                        </div>
+                    `;
+                    lucide.createIcons();
+                }
+            },
+            
+            // Buscar miembros
+            search: (query) => {
+                const q = query.toLowerCase().trim();
+                
+                if (!q) {
+                    AdminMembers.filteredMembers = [...AdminMembers.allMembers];
+                } else {
+                    AdminMembers.filteredMembers = AdminMembers.allMembers.filter(m => {
+                        return (m.fullName || '').toLowerCase().includes(q) ||
+                               (m.email || '').toLowerCase().includes(q) ||
+                               (m.career || '').toLowerCase().includes(q) ||
+                               (m.control || '').toLowerCase().includes(q);
+                    });
+                }
+                
+                AdminMembers.render();
+            },
+            
+            // Renderizar lista de miembros
+            render: () => {
+                const container = document.getElementById('admin-members-list');
+                if (!container) return;
+                
+                if (AdminMembers.filteredMembers.length === 0) {
+                    container.innerHTML = `
+                        <div class="p-8 text-center">
+                            <i data-lucide="user-x" class="w-12 h-12 text-slate-300 mx-auto mb-4"></i>
+                            <p class="text-slate-500 font-bold">No se encontraron miembros</p>
+                        </div>
+                    `;
+                    lucide.createIcons();
+                    return;
+                }
+                
+                const areaColors = {
+                    'gestion': 'bg-purple-100 text-purple-700',
+                    'telecom': 'bg-blue-100 text-blue-700',
+                    'software': 'bg-green-100 text-green-700',
+                    'electronica': 'bg-orange-100 text-orange-700',
+                    'mecanico': 'bg-red-100 text-red-700'
+                };
+                
+                let html = '';
+                AdminMembers.filteredMembers.forEach(member => {
+                    const photo = member.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(member.fullName || 'M')}&background=1B396A&color=fff`;
+                    const areaClass = areaColors[member.area] || 'bg-slate-100 text-slate-700';
+                    const roleDisplay = member.customTitle || member.areaName || member.role || 'Miembro';
+                    const isSuperAdmin = member.email === 'a23490819@itmexicali.edu.mx';
+                    
+                    html += `
+                        <div class="p-4 hover:bg-slate-50 transition flex flex-col sm:flex-row sm:items-center gap-4">
+                            <div class="flex items-center gap-4 flex-1">
+                                <img src="${photo}" class="w-12 h-12 rounded-xl object-cover border-2 border-white shadow-md" alt="${member.fullName}">
+                                <div class="flex-1 min-w-0">
+                                    <p class="font-bold text-slate-800 truncate">${member.fullName || 'Sin nombre'}</p>
+                                    <p class="text-xs text-slate-500 truncate">${member.email || 'Sin email'}</p>
+                                    <div class="flex flex-wrap gap-2 mt-1">
+                                        <span class="text-[10px] ${areaClass} px-2 py-0.5 rounded-full font-bold">${roleDisplay}</span>
+                                        ${member.career ? `<span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">${member.career}</span>` : ''}
+                                        ${member.semester ? `<span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">${member.semester}° Sem</span>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 sm:ml-4">
+                                <button onclick="AdminMembers.edit('${member.id}')" class="px-3 py-2 bg-blue-100 text-blue-700 rounded-lg text-xs font-bold hover:bg-blue-200 transition flex items-center gap-1">
+                                    <i data-lucide="edit-2" class="w-3 h-3"></i>
+                                    Editar
+                                </button>
+                                ${!isSuperAdmin ? `
+                                <button onclick="AdminMembers.delete('${member.id}', '${(member.fullName || '').replace(/'/g, "\\'")}')" class="px-3 py-2 bg-red-100 text-red-700 rounded-lg text-xs font-bold hover:bg-red-200 transition flex items-center gap-1">
+                                    <i data-lucide="trash-2" class="w-3 h-3"></i>
+                                    Eliminar
+                                </button>
+                                ` : `
+                                <span class="px-3 py-2 bg-tec-gold/20 text-tec-gold rounded-lg text-xs font-bold flex items-center gap-1">
+                                    <i data-lucide="shield" class="w-3 h-3"></i>
+                                    Protegido
+                                </span>
+                                `}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = html;
+                lucide.createIcons();
+            },
+            
+            // Editar miembro
+            edit: async (memberId) => {
+                const member = AdminMembers.allMembers.find(m => m.id === memberId);
+                if (!member) return;
+                
+                const { value: formValues } = await Swal.fire({
+                    title: 'Editar Miembro',
+                    html: `
+                        <div class="text-left space-y-4">
+                            <div class="flex items-center gap-3 mb-4 pb-4 border-b">
+                                <img src="${member.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(member.fullName || 'M')}&background=1B396A&color=fff`}" class="w-12 h-12 rounded-full">
+                                <div>
+                                    <p class="font-bold text-slate-800">${member.fullName}</p>
+                                    <p class="text-xs text-slate-500">${member.email}</p>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-slate-600 block mb-1">Nombre Completo</label>
+                                <input id="swal-name" class="w-full p-2 border rounded-lg text-sm" value="${member.fullName || ''}">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-slate-600 block mb-1">Título Personalizado</label>
+                                <input id="swal-title" class="w-full p-2 border rounded-lg text-sm" placeholder="Ej: Líder, Fundador, Mentor..." value="${member.customTitle || ''}">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-slate-600 block mb-1">Rol del Sistema</label>
+                                <select id="swal-role" class="w-full p-2 border rounded-lg text-sm">
+                                    <option value="member" ${member.role === 'member' ? 'selected' : ''}>Miembro</option>
+                                    <option value="admin" ${member.role === 'admin' ? 'selected' : ''}>Admin</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-slate-600 block mb-1">Área</label>
+                                <select id="swal-area" class="w-full p-2 border rounded-lg text-sm">
+                                    <option value="">Sin asignar</option>
+                                    <option value="gestion" ${member.area === 'gestion' ? 'selected' : ''}>Gestión y Vinculación</option>
+                                    <option value="telecom" ${member.area === 'telecom' ? 'selected' : ''}>Telecomunicaciones</option>
+                                    <option value="software" ${member.area === 'software' ? 'selected' : ''}>Software e IA</option>
+                                    <option value="electronica" ${member.area === 'electronica' ? 'selected' : ''}>Electrónica</option>
+                                    <option value="mecanico" ${member.area === 'mecanico' ? 'selected' : ''}>Mecánico</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-slate-600 block mb-1">Carrera</label>
+                                <input id="swal-career" class="w-full p-2 border rounded-lg text-sm" value="${member.career || ''}">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-slate-600 block mb-1">Semestre</label>
+                                <input id="swal-semester" type="number" min="1" max="12" class="w-full p-2 border rounded-lg text-sm" value="${member.semester || ''}">
+                            </div>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Guardar Cambios',
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonColor: '#1B396A',
+                    preConfirm: () => {
+                        return {
+                            fullName: document.getElementById('swal-name').value.trim(),
+                            customTitle: document.getElementById('swal-title').value.trim(),
+                            role: document.getElementById('swal-role').value,
+                            area: document.getElementById('swal-area').value,
+                            career: document.getElementById('swal-career').value.trim(),
+                            semester: document.getElementById('swal-semester').value
+                        };
+                    }
+                });
+                
+                if (formValues) {
+                    try {
+                        Util.loading(true, 'Actualizando miembro...');
+                        
+                        const areaNames = {
+                            'gestion': 'Gestión y Vinculación',
+                            'telecom': 'Telecomunicaciones',
+                            'software': 'Software e IA',
+                            'electronica': 'Electrónica',
+                            'mecanico': 'Mecánico'
+                        };
+                        
+                        await db.collection('users').doc(memberId).update({
+                            fullName: formValues.fullName,
+                            customTitle: formValues.customTitle || null,
+                            role: formValues.role,
+                            area: formValues.area || null,
+                            areaName: areaNames[formValues.area] || null,
+                            career: formValues.career || null,
+                            semester: formValues.semester || null
+                        });
+                        
+                        Util.loading(false);
+                        Util.notify('Miembro actualizado correctamente', 'success');
+                        
+                        // Recargar lista
+                        AdminMembers.load();
+                        
+                    } catch (err) {
+                        Util.loading(false);
+                        console.error('Error actualizando miembro:', err);
+                        Util.notify('Error al actualizar: ' + err.message, 'error');
+                    }
+                }
+            },
+            
+            // Eliminar miembro
+            delete: async (memberId, memberName) => {
+                const result = await Swal.fire({
+                    title: '¿Eliminar miembro?',
+                    html: `
+                        <div class="text-center">
+                            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i data-lucide="user-x" class="w-8 h-8 text-red-500"></i>
+                            </div>
+                            <p class="text-slate-600 mb-2">Estás a punto de eliminar a:</p>
+                            <p class="font-bold text-lg text-slate-800">${memberName}</p>
+                            <p class="text-xs text-red-500 mt-4">Esta acción eliminará su perfil permanentemente.</p>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonColor: '#dc2626',
+                    cancelButtonColor: '#64748b',
+                    didOpen: () => lucide.createIcons()
+                });
+                
+                if (!result.isConfirmed) return;
+                
+                try {
+                    Util.loading(true, 'Eliminando miembro...');
+                    
+                    await db.collection('users').doc(memberId).delete();
+                    
+                    Util.loading(false);
+                    Util.notify(`${memberName} ha sido eliminado`, 'success');
+                    
+                    // Recargar lista
+                    AdminMembers.load();
+                    Database.loadPublicMembers();
+                    
+                } catch (err) {
+                    Util.loading(false);
+                    console.error('Error eliminando miembro:', err);
+                    Util.notify('Error al eliminar: ' + err.message, 'error');
                 }
             }
         };
