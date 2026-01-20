@@ -12072,10 +12072,15 @@
                     // Si pasó las verificaciones, proceder a guardar
                     Util.loading(true, 'Enviando solicitud...');
                     
-                    // Guardar solicitud en Firestore (colección applications)
-                    await db.collection('applications').add({
+                    // Verificar que Firebase esté inicializado
+                    if (!db) {
+                        throw new Error('Base de datos no disponible. Por favor recarga la página.');
+                    }
+                    
+                    // Preparar datos de la solicitud
+                    const applicationData = {
                         name: name,
-                        email: email.toLowerCase(), // Normalizar a minúsculas
+                        email: email.toLowerCase(),
                         phone: phone || '',
                         control: control,
                         semester: semester,
@@ -12085,10 +12090,21 @@
                         skills: skills,
                         availability: availability,
                         reason: reason,
-                        status: 'pending', // pending, reviewed, accepted, rejected
-                        submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        source: 'join-form'
-                    });
+                        status: 'pending',
+                        source: 'join-form',
+                        submittedAtLocal: new Date().toISOString()
+                    };
+                    
+                    // Intentar agregar serverTimestamp si está disponible
+                    try {
+                        applicationData.submittedAt = firebase.firestore.FieldValue.serverTimestamp();
+                    } catch (e) {
+                        console.warn('serverTimestamp no disponible, usando fecha local');
+                        applicationData.submittedAt = new Date();
+                    }
+                    
+                    // Guardar solicitud en Firestore (colección applications)
+                    await db.collection('applications').add(applicationData);
                     
                     Util.loading(false);
                     
@@ -12133,7 +12149,24 @@
                     
                 } catch (error) {
                     console.error('Error al enviar solicitud:', error);
+                    console.error('Detalles del error:', {
+                        code: error.code,
+                        message: error.message,
+                        name: error.name
+                    });
                     Util.loading(false);
+                    
+                    // Mensaje de error más específico
+                    let errorDetail = '';
+                    if (error.code === 'permission-denied') {
+                        errorDetail = 'Error de permisos. Intenta recargar la página.';
+                    } else if (error.code === 'unavailable') {
+                        errorDetail = 'Servicio no disponible. Verifica tu conexión a internet.';
+                    } else if (error.message && error.message.includes('network')) {
+                        errorDetail = 'Error de red. Verifica tu conexión a internet.';
+                    } else {
+                        errorDetail = error.message || 'Error desconocido';
+                    }
                     
                     // Fallback: Intentar abrir cliente de correo
                     const subject = encodeURIComponent(`[SOLICITUD CRAI] ${name} - ${areaName}`);
@@ -12166,7 +12199,9 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeri
                         icon: 'warning',
                         title: 'Error de conexión',
                         html: `
-                            <p class="text-sm text-slate-600 mb-4">No se pudo enviar automáticamente. ¿Deseas enviarlo por correo?</p>
+                            <p class="text-sm text-slate-600 mb-2">No se pudo enviar automáticamente.</p>
+                            <p class="text-xs text-red-500 mb-4">${errorDetail}</p>
+                            <p class="text-sm text-slate-600">¿Deseas enviarlo por correo electrónico?</p>
                         `,
                         showCancelButton: true,
                         confirmButtonText: 'Abrir correo',
