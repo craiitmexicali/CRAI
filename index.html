@@ -16617,7 +16617,6 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeri
                     console.log(`Imagen comprimida: ${width}x${height}, ~${sizeKB}KB`);
                     
                     callback(compressed);
-                    callback(compressed);
                 };
                 img.src = base64;
             },
@@ -16626,9 +16625,14 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeri
                 const input = document.getElementById('skill-input');
                 const skill = input.value.trim();
                 if (skill && !STATE.profileSkills.includes(skill)) {
+                    if (STATE.profileSkills.length >= 20) {
+                        Util.notify('Máximo 20 habilidades permitidas', 'warning');
+                        return;
+                    }
                     STATE.profileSkills.push(skill);
                     Profile.renderSkills();
                     input.value = '';
+                    input.focus();
                 }
             },
 
@@ -16647,14 +16651,23 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeri
             renderSkills: () => {
                 const container = document.getElementById('skills-container');
                 if (!container) return;
-                container.innerHTML = STATE.profileSkills.map(s => `
-                    <span class="inline-flex items-center gap-1 bg-tec-blue/10 text-tec-blue px-2 py-1 rounded-full text-xs font-bold">
-                        ${s}
-                        <button type="button" onclick="Profile.removeSkill('${s}')" class="hover:text-red-500 transition">
+                
+                if (STATE.profileSkills.length === 0) {
+                    container.innerHTML = '<p class="text-xs text-slate-400 w-full text-center py-1">Agrega tus habilidades y tecnologías</p>';
+                    return;
+                }
+                
+                container.innerHTML = STATE.profileSkills.map(s => {
+                    // Escapar el skill para evitar problemas con comillas
+                    const escapedSkill = Util.escapeHtml(s).replace(/'/g, "\\'");
+                    return `
+                    <span class="inline-flex items-center gap-1 bg-tec-blue/10 text-tec-blue px-2 py-1 rounded-full text-xs font-bold group">
+                        ${Util.escapeHtml(s)}
+                        <button type="button" onclick="Profile.removeSkill('${escapedSkill}')" class="hover:text-red-500 transition opacity-50 group-hover:opacity-100" title="Eliminar">
                             <i data-lucide="x" class="w-3 h-3"></i>
                         </button>
-                    </span>
-                `).join('');
+                    </span>`;
+                }).join('');
                 lucide.createIcons();
             },
 
