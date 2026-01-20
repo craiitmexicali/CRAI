@@ -10853,7 +10853,10 @@
                 
                 // Email del superadmin que puede eliminar miembros
                 const SUPER_ADMIN_EMAIL = 'a23490819@itmexicali.edu.mx';
-                const canDeleteMembers = STATE.currentUser && STATE.currentUser.email === SUPER_ADMIN_EMAIL;
+                // Verificar si el usuario actual es fundador
+                const currentUserTitle = (STATE.profile?.customTitle || '').toLowerCase();
+                const isFounder = currentUserTitle.includes('fundador') || currentUserTitle.includes('founder');
+                const canDeleteMembers = STATE.currentUser && (STATE.currentUser.email === SUPER_ADMIN_EMAIL || isFounder);
 
                 try {
                     const snap = await db.collection('users').orderBy('joinedAt', 'desc').limit(20).get();
@@ -10941,9 +10944,12 @@
             },
             
             deleteMember: async (userId, userName) => {
-                // Verificar que solo el superadmin pueda eliminar
+                // Verificar que solo el superadmin o fundadores puedan eliminar
                 const SUPER_ADMIN_EMAIL = 'a23490819@itmexicali.edu.mx';
-                if (!STATE.currentUser || STATE.currentUser.email !== SUPER_ADMIN_EMAIL) {
+                const currentUserTitle = (STATE.profile?.customTitle || '').toLowerCase();
+                const isFounder = currentUserTitle.includes('fundador') || currentUserTitle.includes('founder');
+                
+                if (!STATE.currentUser || (STATE.currentUser.email !== SUPER_ADMIN_EMAIL && !isFounder)) {
                     Util.notify('No tienes permisos para eliminar miembros', 'error');
                     return;
                 }
