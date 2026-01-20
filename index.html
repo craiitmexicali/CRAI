@@ -7621,6 +7621,9 @@
                     
                     // Inicializar gestión de miembros (solo para admin/fundador)
                     setTimeout(() => AdminMembers.init(), 700);
+                    
+                    // Actualizar presencia (marcar usuario como online)
+                    Communications.updatePresence();
 
                 } else {
                     uiPublic?.classList.remove('hidden');
@@ -8250,7 +8253,16 @@
                 }
             },
 
-            logout: () => {
+            logout: async () => {
+                // Marcar como offline antes de cerrar sesión
+                if (STATE.currentUser) {
+                    try {
+                        await db.collection('presence').doc(STATE.currentUser.uid).update({ online: false });
+                    } catch (e) {
+                        console.log('No se pudo actualizar presencia:', e);
+                    }
+                }
+                
                 auth.signOut().then(() => {
                     Router.to('landing');
                     Util.notify("Sesión Finalizada", "info");
@@ -20453,11 +20465,103 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeri
         const Communications = {
             currentChannel: 'general',
             unsubscribeChat: null,
+            unsubscribeOnlineMembers: null,
 
             load: () => {
                 Communications.loadAnnouncements();
                 Communications.connectChat();
                 Communications.checkAnnouncementPermission();
+                Communications.loadOnlineMembers();
+                Communications.updatePresence();
+            },
+
+            // Sistema de presencia - marca al usuario como online
+            updatePresence: async () => {
+                if (!STATE.currentUser) return;
+                
+                try {
+                    const userRef = db.collection('presence').doc(STATE.currentUser.uid);
+                    
+                    // Marcar como online
+                    await userRef.set({
+                        online: true,
+                        lastSeen: firebase.firestore.FieldValue.serverTimestamp(),
+                        displayName: STATE.currentUser.displayName || 'Usuario',
+                        photoURL: STATE.currentUser.photoURL || null,
+                        uid: STATE.currentUser.uid
+                    }, { merge: true });
+
+                    // Actualizar cada 2 minutos para mantener presencia
+                    setInterval(async () => {
+                        if (STATE.currentUser) {
+                            await userRef.update({
+                                lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+                            }).catch(() => {});
+                        }
+                    }, 120000);
+
+                    // Marcar como offline cuando cierre la pestaña
+                    window.addEventListener('beforeunload', async () => {
+                        await userRef.update({ online: false }).catch(() => {});
+                    });
+
+                } catch (e) {
+                    console.error('Error updating presence:', e);
+                }
+            },
+
+            // Cargar miembros online en tiempo real
+            loadOnlineMembers: () => {
+                const container = document.getElementById('online-members');
+                const countEl = document.getElementById('chat-online-count');
+                if (!container) return;
+
+                // Desuscribirse del listener anterior
+                if (Communications.unsubscribeOnlineMembers) {
+                    Communications.unsubscribeOnlineMembers();
+                }
+
+                // Escuchar usuarios online (activos en los últimos 3 minutos)
+                const threeMinutesAgo = new Date(Date.now() - 3 * 60 * 1000);
+
+                Communications.unsubscribeOnlineMembers = db.collection('presence')
+                    .where('online', '==', true)
+                    .where('lastSeen', '>=', threeMinutesAgo)
+                    .onSnapshot(snapshot => {
+                        if (snapshot.empty) {
+                            container.innerHTML = `<p class="text-slate-400 text-xs">No hay miembros conectados</p>`;
+                            if (countEl) countEl.textContent = '0';
+                            return;
+                        }
+
+                        container.innerHTML = '';
+                        let onlineCount = 0;
+
+                        snapshot.forEach(doc => {
+                            const member = doc.data();
+                            onlineCount++;
+                            
+                            const avatarUrl = member.photoURL || 
+                                `https://ui-avatars.com/api/?name=${encodeURIComponent(member.displayName || 'U')}&background=1B396A&color=fff`;
+                            
+                            container.innerHTML += `
+                                <div class="relative group cursor-pointer" title="${member.displayName || 'Usuario'}">
+                                    <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-white shadow-md hover:scale-110 transition-transform">
+                                        <img src="${avatarUrl}" alt="${member.displayName}" class="w-full h-full object-cover">
+                                    </div>
+                                    <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
+                                    <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap pointer-events-none z-10">
+                                        ${member.displayName || 'Usuario'}
+                                    </div>
+                                </div>
+                            `;
+                        });
+
+                        if (countEl) countEl.textContent = onlineCount;
+                    }, error => {
+                        console.error('Error loading online members:', error);
+                        container.innerHTML = `<p class="text-slate-400 text-xs">Error al cargar</p>`;
+                    });
             },
 
             checkAnnouncementPermission: () => {
