@@ -16633,7 +16633,17 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeri
 
             addSkill: () => {
                 const input = document.getElementById('skill-input');
+                if (!input) {
+                    console.error('No se encontró el input de skills');
+                    return;
+                }
                 const skill = input.value.trim();
+                
+                // Asegurar que profileSkills sea un array
+                if (!Array.isArray(STATE.profileSkills)) {
+                    STATE.profileSkills = STATE.profile?.skills || [];
+                }
+                
                 if (skill && !STATE.profileSkills.includes(skill)) {
                     if (STATE.profileSkills.length >= 20) {
                         Util.notify('Máximo 20 habilidades permitidas', 'warning');
@@ -16643,6 +16653,9 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeri
                     Profile.renderSkills();
                     input.value = '';
                     input.focus();
+                    Util.notify('Skill agregada: ' + skill, 'success');
+                } else if (STATE.profileSkills.includes(skill)) {
+                    Util.notify('Esta skill ya existe', 'warning');
                 }
             },
 
@@ -16654,13 +16667,27 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeri
             },
 
             removeSkill: (skill) => {
+                if (!Array.isArray(STATE.profileSkills)) {
+                    STATE.profileSkills = [];
+                }
                 STATE.profileSkills = STATE.profileSkills.filter(s => s !== skill);
                 Profile.renderSkills();
+                Util.notify('Skill eliminada', 'info');
             },
 
             renderSkills: () => {
                 const container = document.getElementById('skills-container');
-                if (!container) return;
+                if (!container) {
+                    console.log('Container de skills no encontrado');
+                    return;
+                }
+                
+                // Asegurar que profileSkills sea un array
+                if (!Array.isArray(STATE.profileSkills)) {
+                    STATE.profileSkills = STATE.profile?.skills || [];
+                }
+                
+                console.log('Renderizando skills:', STATE.profileSkills);
                 
                 if (STATE.profileSkills.length === 0) {
                     container.innerHTML = '<p class="text-xs text-slate-400 w-full text-center py-1">Agrega tus habilidades y tecnologías</p>';
@@ -16722,12 +16749,16 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeri
                     if (radio) radio.checked = true;
                 }
                 
-                // Skills
-                STATE.profileSkills = p.skills || [];
-                Profile.renderSkills();
+                // Skills - cargar desde el perfil
+                const skillsFromProfile = p.skills || [];
+                console.log('Skills cargadas del perfil:', skillsFromProfile);
+                STATE.profileSkills = Array.isArray(skillsFromProfile) ? [...skillsFromProfile] : [];
                 
-                // Actualizar iconos de Lucide
-                setTimeout(() => lucide.createIcons(), 50);
+                // Renderizar skills después de un pequeño delay para asegurar que el DOM esté listo
+                setTimeout(() => {
+                    Profile.renderSkills();
+                    lucide.createIcons();
+                }, 100);
             }
         };
 
