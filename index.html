@@ -4406,7 +4406,11 @@
                                         </div>
                                         <div>
                                             <label class="text-[11px] font-bold text-slate-600 uppercase tracking-wide mb-1 block">Título / Rol en el Club</label>
-                                            <input id="profile-title" type="text" placeholder="Ej: Líder y Fundador, Coordinador, etc." class="w-full bg-slate-50 border border-slate-200 rounded-lg p-3 text-sm text-slate-700 focus:border-tec-blue outline-none">
+                                            <div id="profile-title-display" class="w-full bg-slate-100 border border-slate-200 rounded-lg p-3 text-sm text-slate-500 flex items-center justify-between">
+                                                <span id="profile-title-text">Sin título asignado</span>
+                                                <span class="text-[9px] bg-slate-200 text-slate-500 px-2 py-0.5 rounded-full">Solo admin puede cambiar</span>
+                                            </div>
+                                            <input id="profile-title" type="hidden" value="">
                                         </div>
                                     </div>
 
@@ -10890,7 +10894,8 @@
                 if (!STATE.currentUser) { Modal.open('auth'); return; }
 
                 const fullName = document.getElementById('profile-name').value.trim();
-                const customTitle = document.getElementById('profile-title').value.trim();
+                // El customTitle solo puede ser cambiado por admin desde el panel de gestión
+                const customTitle = STATE.profile?.customTitle || '';
                 const photoURL = document.getElementById('profile-photo').value.trim();
                 const controlNumber = document.getElementById('profile-control').value.trim();
                 const semester = document.getElementById('profile-semester').value;
@@ -11224,6 +11229,11 @@
                 const targetTab = document.getElementById(`tab-${tabName}`);
                 if (targetTab) {
                     targetTab.classList.remove('hidden');
+                }
+                
+                // Si es el tab de perfil, cargar los datos y skills
+                if (tabName === 'profile') {
+                    Profile.loadFromState();
                 }
             }
         };
@@ -16678,7 +16688,7 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeri
                 const setVal = (id, val) => { const el = document.getElementById(id); if (el && val) el.value = val; };
                 
                 setVal('profile-name', p.fullName);
-                setVal('profile-title', p.customTitle); // Título personalizado
+                setVal('profile-title', p.customTitle); // Título personalizado (campo oculto)
                 setVal('profile-photo', p.photoURL); // Ahora guarda Base64 o URL
                 setVal('profile-control', p.controlNumber);
                 setVal('profile-semester', p.semester);
@@ -16686,6 +16696,20 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeri
                 setVal('profile-bio', p.bio);
                 setVal('profile-github', p.github);
                 setVal('profile-linkedin', p.linkedin);
+                
+                // Mostrar el título personalizado en el campo de solo lectura
+                const titleTextEl = document.getElementById('profile-title-text');
+                if (titleTextEl) {
+                    if (p.customTitle && p.customTitle.trim()) {
+                        titleTextEl.textContent = p.customTitle;
+                        titleTextEl.classList.remove('text-slate-400');
+                        titleTextEl.classList.add('text-tec-blue', 'font-bold');
+                    } else {
+                        titleTextEl.textContent = 'Sin título asignado';
+                        titleTextEl.classList.add('text-slate-400');
+                        titleTextEl.classList.remove('text-tec-blue', 'font-bold');
+                    }
+                }
                 
                 // Preview photo (funciona con Base64 y URLs)
                 if (p.photoURL) {
