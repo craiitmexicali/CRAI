@@ -13918,9 +13918,47 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeri
                     
                     Database.loadAchievementsPanel();
                     Database.loadPublicMembers();
+                    Members.render();
                 } catch (err) {
                     console.error('Error cambiando overlay:', err);
                     Util.notify('Error al cambiar el overlay', 'error');
+                }
+            },
+            
+            // Verificar si el fundador prefiere mostrarse como líder de área
+            prefersAreaStyle: (user) => {
+                // Solo aplica a fundadores principales
+                const title = (user.customTitle || '').toLowerCase();
+                const isFounder = title.includes('fundador') || title.includes('founder');
+                if (!isFounder) return false;
+                
+                // Si tiene preferencia guardada, usarla
+                return user.showAsAreaLeader === true;
+            },
+            
+            // Toggle para mostrar como líder de área o como fundador dorado
+            toggleAreaStyle: async (enabled) => {
+                if (!STATE.currentUser) return;
+                
+                try {
+                    await db.collection('users').doc(STATE.currentUser.uid).update({
+                        showAsAreaLeader: enabled
+                    });
+                    
+                    STATE.profile.showAsAreaLeader = enabled;
+                    
+                    Util.notify(
+                        enabled 
+                            ? 'Ahora te muestras con estilo de Líder de Área ⭐' 
+                            : 'Ahora te muestras con estilo de Fundador 👑', 
+                        'success'
+                    );
+                    
+                    Members.render();
+                    Database.loadPublicMembers();
+                } catch (err) {
+                    console.error('Error cambiando estilo:', err);
+                    Util.notify('Error al cambiar el estilo', 'error');
                 }
             },
             
@@ -14658,7 +14696,42 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeri
                                             </div>
                                         </button>
                                     </div>
-                                </div>`;
+                                </div>
+                                
+                                <!-- Toggle para estilo de área -->
+                                ${(() => {
+                                    const showAsArea = STATE.profile?.showAsAreaLeader === true;
+                                    const areaColors = {
+                                        'gestion': { name: 'Gestión', gradient: 'from-purple-500 to-purple-600' },
+                                        'telecom': { name: 'Telecomunicaciones', gradient: 'from-blue-500 to-blue-600' },
+                                        'software': { name: 'Software', gradient: 'from-green-500 to-green-600' },
+                                        'electronica': { name: 'Electrónica', gradient: 'from-orange-500 to-orange-600' },
+                                        'mecanico': { name: 'Mecánico', gradient: 'from-red-500 to-red-600' }
+                                    };
+                                    const userArea = STATE.profile?.area || 'software';
+                                    const areaInfo = areaColors[userArea] || areaColors['software'];
+                                    
+                                    return '<div class="mt-3 p-3 bg-gradient-to-r from-slate-50 to-slate-100 border border-slate-200 rounded-xl">' +
+                                        '<div class="flex items-center justify-between">' +
+                                            '<div class="flex items-center gap-2">' +
+                                                '<div class="w-8 h-8 bg-gradient-to-br ' + areaInfo.gradient + ' rounded-lg flex items-center justify-center shadow-sm">' +
+                                                    '<i data-lucide="star" class="w-4 h-4 text-white"></i>' +
+                                                '</div>' +
+                                                '<div>' +
+                                                    '<span class="text-xs font-bold text-slate-800">Estilo de Líder de Área</span>' +
+                                                    '<p class="text-[10px] text-slate-500">Mostrar con color de ' + areaInfo.name + '</p>' +
+                                                '</div>' +
+                                            '</div>' +
+                                            '<button onclick="Achievements.toggleAreaStyle(' + (!showAsArea) + ')" class="relative w-12 h-6 rounded-full transition-all ' + (showAsArea ? 'bg-gradient-to-r ' + areaInfo.gradient : 'bg-slate-300') + '">' +
+                                                '<div class="absolute top-1 ' + (showAsArea ? 'right-1' : 'left-1') + ' w-4 h-4 bg-white rounded-full shadow transition-all flex items-center justify-center">' +
+                                                    (showAsArea ? '<i data-lucide="star" class="w-2 h-2 text-slate-600"></i>' : '') +
+                                                '</div>' +
+                                            '</button>' +
+                                        '</div>' +
+                                        '<p class="text-[9px] text-slate-400 mt-2 ml-10">Si activas esto, tu tarjeta mostrará el marco de líder con el color de tu área en lugar del dorado de fundador.</p>' +
+                                    '</div>';
+                                })()}
+                                `;
                             })()}
                             <div class="flex gap-2 mt-4">
                                 <button onclick="Achievements.showAllAchievements()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2">
@@ -15416,11 +15489,12 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeri
                     const regularMembers = Members.allMembers.filter(m => !isMainFounder(m) && !isAreaLeader(m) && !isMentor(m));
                     filtered = [...mainFounders, ...mentors, ...areaLeaders, ...regularMembers];
                 } else {
-                    // En áreas específicas: Líderes de ESA área primero, luego miembros del área
-                    // Fundadores principales y Maestros/Tutores NO aparecen aquí
-                    const areaLeaders = Members.allMembers.filter(m => isAreaLeader(m) && !isMentor(m) && m.area === Members.currentFilter);
+                    // En áreas específicas: Fundadores del área primero, luego líderes, luego miembros regulares
+                    // Fundadores que pertenecen a esta área aparecen primero
+                    const areaFounders = Members.allMembers.filter(m => isMainFounder(m) && m.area === Members.currentFilter);
+                    const areaLeaders = Members.allMembers.filter(m => isAreaLeader(m) && !isMentor(m) && !isMainFounder(m) && m.area === Members.currentFilter);
                     const areaMembers = Members.allMembers.filter(m => !isAreaLeader(m) && !isMainFounder(m) && !isMentor(m) && m.area === Members.currentFilter);
-                    filtered = [...areaLeaders, ...areaMembers];
+                    filtered = [...areaFounders, ...areaLeaders, ...areaMembers];
                 }
 
                 if (filtered.length === 0) {
@@ -15447,8 +15521,10 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeri
                     const displayRole = u.customTitle || u.areaName || u.role || 'Miembro';
                     const roleColor = u.customTitle ? 'bg-gradient-to-r from-tec-gold to-yellow-500 text-white' : `${areaStyle.bg} ${areaStyle.text}`;
                     const skills = u.skills || [];
-                    const mainFounder = isMainFounder(u);
-                    const areaLeader = isAreaLeader(u);
+                    const rawMainFounder = isMainFounder(u);
+                    const prefersAreaStyle = Achievements.prefersAreaStyle(u); // Si fundador prefiere mostrarse como líder de área
+                    const mainFounder = rawMainFounder && !prefersAreaStyle; // Solo es "mainFounder" si NO prefiere estilo de área
+                    const areaLeader = isAreaLeader(u) || (rawMainFounder && prefersAreaStyle); // Si es líder O es fundador que prefiere estilo de área
                     const mentor = isMentor(u);
                     const specialFrame = Achievements.hasSpecialFrame(u); // 'rainbow', 'cosmic', 'global', 'frutiger' o false
                     const hasFounderOverlay = Achievements.hasFounderOverlay(u); // true si tiene logro de fundador
