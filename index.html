@@ -4503,9 +4503,9 @@
                                     <!-- Skills / Tecnologías -->
                                     <div>
                                         <label class="text-[11px] font-bold text-slate-600 uppercase tracking-wide mb-2 block">Skills y Tecnologías</label>
-                                        <div class="flex flex-wrap gap-2 mb-2" id="skills-container"></div>
+                                        <div class="flex flex-wrap gap-2 mb-2" id="profile-skills-container"></div>
                                         <div class="flex gap-2">
-                                            <input id="skill-input" type="text" placeholder="Escribe un skill y presiona Enter" class="flex-1 bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs focus:border-tec-blue outline-none" onkeypress="Profile.addSkillOnEnter(event)">
+                                            <input id="profile-skill-input" type="text" placeholder="Escribe un skill y presiona Enter" class="flex-1 bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-xs focus:border-tec-blue outline-none" onkeypress="Profile.addSkillOnEnter(event)">
                                             <button type="button" onclick="Profile.addSkill()" class="px-3 py-2 bg-tec-gold text-white rounded-lg text-xs font-bold hover:bg-yellow-600 transition">
                                                 <i data-lucide="plus" class="w-4 h-4"></i>
                                             </button>
@@ -16632,9 +16632,9 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeri
             },
 
             addSkill: () => {
-                const input = document.getElementById('skill-input');
+                const input = document.getElementById('profile-skill-input');
                 if (!input) {
-                    console.error('No se encontró el input de skills');
+                    console.error('No se encontró el input de skills del perfil');
                     return;
                 }
                 const skill = input.value.trim();
@@ -16676,9 +16676,9 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeri
             },
 
             renderSkills: () => {
-                const container = document.getElementById('skills-container');
+                const container = document.getElementById('profile-skills-container');
                 if (!container) {
-                    console.log('Container de skills no encontrado');
+                    console.log('Container de skills del perfil no encontrado');
                     return;
                 }
                 
