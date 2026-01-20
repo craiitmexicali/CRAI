@@ -13954,6 +13954,8 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeri
                         'success'
                     );
                     
+                    // Re-renderizar panel de logros para actualizar el toggle
+                    Database.loadAchievementsPanel();
                     Members.render();
                     Database.loadPublicMembers();
                 } catch (err) {
