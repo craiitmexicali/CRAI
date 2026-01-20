@@ -28,15 +28,20 @@ const db = firebase.firestore();
 
 // Configuración adicional de Firestore (opcional)
 db.settings({
-    cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED
+    cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED,
+    ignoreUndefinedProperties: true
 });
 
 // Habilitar persistencia offline (opcional)
+// Nota: Puede fallar en modo incógnito, lo cual es normal
 db.enablePersistence({ synchronizeTabs: true }).catch((err) => {
     if (err.code === 'failed-precondition') {
         console.warn('Persistencia fallida: Múltiples pestañas abiertas');
     } else if (err.code === 'unimplemented') {
         console.warn('Persistencia no soportada en este navegador');
+    } else {
+        // Modo incógnito u otros casos - es normal que falle
+        console.warn('Persistencia offline no disponible:', err.code);
     }
 });
 

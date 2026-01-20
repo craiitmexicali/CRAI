@@ -211,52 +211,62 @@ const JoinForm = {
         
         try {
             // === SISTEMA ANTI-SPAM: Verificar si ya existe una solicitud ===
-            // Buscar por correo electrónico
-            const emailCheck = await db.collection('applications')
-                .where('email', '==', email.toLowerCase())
-                .limit(1)
-                .get();
+            // Nota: Esta verificación puede fallar en modo incógnito sin autenticación
+            // En ese caso, se procede a enviar y Firestore manejará duplicados
+            let skipDuplicateCheck = false;
             
-            if (!emailCheck.empty) {
-                Util.loading(false);
-                await Swal.fire({
-                    icon: 'warning',
-                    title: 'Solicitud ya registrada',
-                    html: `
-                        <p class="text-slate-600 mb-4">Ya existe una solicitud con el correo <strong>${email}</strong></p>
-                        <div class="bg-blue-50 p-4 rounded-xl text-left">
-                            <p class="text-xs text-slate-600">Si necesitas actualizar tu información o tienes dudas, contacta a:</p>
-                            <a href="mailto:contacto@clubcrai.com" class="text-sm font-bold text-tec-blue">contacto@clubcrai.com</a>
-                        </div>
-                    `,
-                    confirmButtonText: 'Entendido',
-                    confirmButtonColor: '#1B396A'
-                });
-                return;
-            }
-            
-            // Buscar por número de control
-            const controlCheck = await db.collection('applications')
-                .where('control', '==', control)
-                .limit(1)
-                .get();
-            
-            if (!controlCheck.empty) {
-                Util.loading(false);
-                await Swal.fire({
-                    icon: 'warning',
-                    title: 'Solicitud ya registrada',
-                    html: `
-                        <p class="text-slate-600 mb-4">Ya existe una solicitud con el número de control <strong>${control}</strong></p>
-                        <div class="bg-blue-50 p-4 rounded-xl text-left">
-                            <p class="text-xs text-slate-600">Si necesitas actualizar tu información o tienes dudas, contacta a:</p>
-                            <a href="mailto:contacto@clubcrai.com" class="text-sm font-bold text-tec-blue">contacto@clubcrai.com</a>
-                        </div>
-                    `,
-                    confirmButtonText: 'Entendido',
-                    confirmButtonColor: '#1B396A'
-                });
-                return;
+            try {
+                // Buscar por correo electrónico
+                const emailCheck = await db.collection('applications')
+                    .where('email', '==', email.toLowerCase())
+                    .limit(1)
+                    .get();
+                
+                if (!emailCheck.empty) {
+                    Util.loading(false);
+                    await Swal.fire({
+                        icon: 'warning',
+                        title: 'Solicitud ya registrada',
+                        html: `
+                            <p class="text-slate-600 mb-4">Ya existe una solicitud con el correo <strong>${email}</strong></p>
+                            <div class="bg-blue-50 p-4 rounded-xl text-left">
+                                <p class="text-xs text-slate-600">Si necesitas actualizar tu información o tienes dudas, contacta a:</p>
+                                <a href="mailto:contacto@clubcrai.com" class="text-sm font-bold text-tec-blue">contacto@clubcrai.com</a>
+                            </div>
+                        `,
+                        confirmButtonText: 'Entendido',
+                        confirmButtonColor: '#1B396A'
+                    });
+                    return;
+                }
+                
+                // Buscar por número de control
+                const controlCheck = await db.collection('applications')
+                    .where('control', '==', control)
+                    .limit(1)
+                    .get();
+                
+                if (!controlCheck.empty) {
+                    Util.loading(false);
+                    await Swal.fire({
+                        icon: 'warning',
+                        title: 'Solicitud ya registrada',
+                        html: `
+                            <p class="text-slate-600 mb-4">Ya existe una solicitud con el número de control <strong>${control}</strong></p>
+                            <div class="bg-blue-50 p-4 rounded-xl text-left">
+                                <p class="text-xs text-slate-600">Si necesitas actualizar tu información o tienes dudas, contacta a:</p>
+                                <a href="mailto:contacto@clubcrai.com" class="text-sm font-bold text-tec-blue">contacto@clubcrai.com</a>
+                            </div>
+                        `,
+                        confirmButtonText: 'Entendido',
+                        confirmButtonColor: '#1B396A'
+                    });
+                    return;
+                }
+            } catch (checkError) {
+                // Si falla la verificación (ej: modo incógnito sin permisos), continuar
+                console.warn('Verificación anti-spam omitida:', checkError.message);
+                skipDuplicateCheck = true;
             }
             
             // Si pasó las verificaciones, proceder a guardar
