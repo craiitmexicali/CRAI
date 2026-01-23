@@ -9810,6 +9810,448 @@
                 }
             },
 
+            // Generar Reporte Técnico PDF del proyecto (Solo Miembros)
+            generateProjectPDF: async (projectId) => {
+                if (!STATE.currentUser) {
+                    Util.notify("Inicia sesión para generar reportes", "warning");
+                    Modal.open('auth');
+                    return;
+                }
+
+                try {
+                    Util.notify("Generando reporte PDF...", "info");
+                    
+                    const doc = await db.collection('projects').doc(projectId).get();
+                    if (!doc.exists) {
+                        Util.notify("Proyecto no encontrado", "error");
+                        return;
+                    }
+
+                    const p = doc.data();
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF('p', 'mm', 'letter');
+                    
+                    const pageWidth = pdf.internal.pageSize.getWidth();
+                    const pageHeight = pdf.internal.pageSize.getHeight();
+                    const margin = 20;
+                    let yPos = margin;
+                    
+                    // Colores
+                    const tecBlue = [27, 57, 106];
+                    const tecGold = [207, 167, 78];
+                    const grayDark = [51, 65, 85];
+                    const grayLight = [148, 163, 184];
+                    
+                    // Función auxiliar para agregar nueva página si es necesario
+                    const checkNewPage = (requiredSpace = 30) => {
+                        if (yPos + requiredSpace > pageHeight - margin) {
+                            pdf.addPage();
+                            yPos = margin;
+                            return true;
+                        }
+                        return false;
+                    };
+                    
+                    // ============ ENCABEZADO ============
+                    // Barra superior azul
+                    pdf.setFillColor(...tecBlue);
+                    pdf.rect(0, 0, pageWidth, 45, 'F');
+                    
+                    // Logo CRAI (texto estilizado)
+                    pdf.setTextColor(255, 255, 255);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.setFontSize(24);
+                    pdf.text('CRAI', margin, 22);
+                    
+                    pdf.setFontSize(10);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.text('Club de Robótica e Ingeniería Avanzada', margin, 30);
+                    pdf.text('TecNM Campus Mexicali', margin, 36);
+                    
+                    // Fecha del reporte
+                    pdf.setFontSize(9);
+                    const reportDate = new Date().toLocaleDateString('es-MX', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    pdf.text(`Reporte generado: ${reportDate}`, pageWidth - margin, 22, { align: 'right' });
+                    pdf.text(`Por: ${STATE.currentUser.displayName || STATE.currentUser.email}`, pageWidth - margin, 30, { align: 'right' });
+                    
+                    yPos = 55;
+                    
+                    // ============ TÍTULO DEL PROYECTO ============
+                    pdf.setTextColor(...tecBlue);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.setFontSize(8);
+                    pdf.text('REPORTE TÉCNICO DE PROYECTO', margin, yPos);
+                    yPos += 8;
+                    
+                    pdf.setFontSize(18);
+                    pdf.setTextColor(...grayDark);
+                    const titleLines = pdf.splitTextToSize(p.title || 'Sin título', pageWidth - margin * 2);
+                    pdf.text(titleLines, margin, yPos);
+                    yPos += titleLines.length * 8 + 5;
+                    
+                    // Línea decorativa
+                    pdf.setDrawColor(...tecGold);
+                    pdf.setLineWidth(1);
+                    pdf.line(margin, yPos, margin + 40, yPos);
+                    yPos += 10;
+                    
+                    // ============ INFORMACIÓN GENERAL ============
+                    pdf.setFillColor(245, 247, 250);
+                    pdf.roundedRect(margin, yPos, pageWidth - margin * 2, 35, 3, 3, 'F');
+                    
+                    pdf.setTextColor(...grayDark);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.setFontSize(10);
+                    
+                    const infoY = yPos + 8;
+                    const col1 = margin + 5;
+                    const col2 = margin + 85;
+                    
+                    pdf.text('Categoría:', col1, infoY);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.text(p.category || 'General', col1 + 25, infoY);
+                    
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.text('Autor:', col2, infoY);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.text(p.authorName || 'Anónimo', col2 + 18, infoY);
+                    
+                    const infoY2 = infoY + 10;
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.text('Fecha:', col1, infoY2);
+                    pdf.setFont('helvetica', 'normal');
+                    const dateStr = p.date ? new Date(p.date.seconds * 1000).toLocaleDateString('es-MX', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                    }) : 'Sin fecha';
+                    pdf.text(dateStr, col1 + 18, infoY2);
+                    
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.text('Estado:', col2, infoY2);
+                    pdf.setFont('helvetica', 'normal');
+                    const statusText = p.status === 'in_progress' ? 'En desarrollo' : 'Completado';
+                    pdf.text(statusText, col2 + 18, infoY2);
+                    
+                    const infoY3 = infoY2 + 10;
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.text('ID Proyecto:', col1, infoY3);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.setFontSize(8);
+                    pdf.text(projectId, col1 + 30, infoY3);
+                    
+                    yPos += 45;
+                    
+                    // ============ DESCRIPCIÓN ============
+                    checkNewPage(40);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.setFontSize(12);
+                    pdf.setTextColor(...tecBlue);
+                    pdf.text('Descripción del Proyecto', margin, yPos);
+                    yPos += 7;
+                    
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.setFontSize(10);
+                    pdf.setTextColor(...grayDark);
+                    const descLines = pdf.splitTextToSize(p.desc || 'Sin descripción disponible.', pageWidth - margin * 2);
+                    
+                    descLines.forEach(line => {
+                        checkNewPage(8);
+                        pdf.text(line, margin, yPos);
+                        yPos += 6;
+                    });
+                    yPos += 8;
+                    
+                    // ============ EQUIPO DEL PROYECTO ============
+                    if (p.participants && p.participants.length > 0) {
+                        checkNewPage(30);
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.setFontSize(12);
+                        pdf.setTextColor(...tecBlue);
+                        pdf.text('Equipo del Proyecto', margin, yPos);
+                        yPos += 10;
+                        
+                        // Tabla de participantes
+                        const participantsData = p.participants.map((part, idx) => [
+                            (idx + 1).toString(),
+                            part.name || 'Sin nombre',
+                            part.email || 'Sin correo',
+                            'Colaborador'
+                        ]);
+                        
+                        pdf.autoTable({
+                            startY: yPos,
+                            head: [['#', 'Nombre', 'Correo', 'Rol']],
+                            body: participantsData,
+                            margin: { left: margin, right: margin },
+                            headStyles: { 
+                                fillColor: tecBlue,
+                                textColor: [255, 255, 255],
+                                fontStyle: 'bold',
+                                fontSize: 9
+                            },
+                            bodyStyles: {
+                                fontSize: 9,
+                                textColor: grayDark
+                            },
+                            alternateRowStyles: {
+                                fillColor: [248, 250, 252]
+                            },
+                            columnStyles: {
+                                0: { cellWidth: 10, halign: 'center' },
+                                1: { cellWidth: 55 },
+                                2: { cellWidth: 70 },
+                                3: { cellWidth: 30 }
+                            }
+                        });
+                        
+                        yPos = pdf.lastAutoTable.finalY + 12;
+                    }
+                    
+                    // ============ PROGRESO Y TAREAS ============
+                    const projectTasks = ProjectsFilter.tasksByProject[projectId] || [];
+                    const projectProgress = ProjectsFilter.getProjectProgress(projectId, p);
+                    
+                    if (projectTasks.length > 0 || projectProgress.percent > 0) {
+                        checkNewPage(50);
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.setFontSize(12);
+                        pdf.setTextColor(...tecBlue);
+                        pdf.text('Progreso del Proyecto', margin, yPos);
+                        yPos += 10;
+                        
+                        // Barra de progreso
+                        const barWidth = pageWidth - margin * 2;
+                        const barHeight = 8;
+                        
+                        // Fondo de la barra
+                        pdf.setFillColor(226, 232, 240);
+                        pdf.roundedRect(margin, yPos, barWidth, barHeight, 2, 2, 'F');
+                        
+                        // Progreso
+                        const progressWidth = (barWidth * projectProgress.percent) / 100;
+                        if (progressWidth > 0) {
+                            pdf.setFillColor(16, 185, 129); // Emerald
+                            pdf.roundedRect(margin, yPos, progressWidth, barHeight, 2, 2, 'F');
+                        }
+                        
+                        // Porcentaje
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.setFontSize(10);
+                        pdf.setTextColor(...grayDark);
+                        pdf.text(`${projectProgress.percent}%`, pageWidth - margin, yPos + 6, { align: 'right' });
+                        yPos += 15;
+                        
+                        // Estadísticas de tareas
+                        if (projectTasks.length > 0) {
+                            pdf.setFont('helvetica', 'normal');
+                            pdf.setFontSize(9);
+                            pdf.setTextColor(...grayLight);
+                            pdf.text(`Tareas completadas: ${projectProgress.done} de ${projectProgress.total}`, margin, yPos);
+                            yPos += 10;
+                            
+                            // Tabla de tareas
+                            const tasksData = projectTasks.map((task, idx) => {
+                                const statusMap = {
+                                    'done': '✓ Completada',
+                                    'progress': '◐ En progreso',
+                                    'pending': '○ Pendiente'
+                                };
+                                const areaMap = {
+                                    'gestion': 'Gestión',
+                                    'telecom': 'Telecom',
+                                    'software': 'Software',
+                                    'electronica': 'Electrónica',
+                                    'mecanico': 'Mecánico'
+                                };
+                                return [
+                                    (idx + 1).toString(),
+                                    task.title || 'Sin título',
+                                    areaMap[task.area] || 'Sin área',
+                                    statusMap[task.status] || task.status || 'Pendiente'
+                                ];
+                            });
+                            
+                            checkNewPage(30);
+                            pdf.autoTable({
+                                startY: yPos,
+                                head: [['#', 'Tarea', 'Área', 'Estado']],
+                                body: tasksData,
+                                margin: { left: margin, right: margin },
+                                headStyles: { 
+                                    fillColor: [16, 185, 129],
+                                    textColor: [255, 255, 255],
+                                    fontStyle: 'bold',
+                                    fontSize: 9
+                                },
+                                bodyStyles: {
+                                    fontSize: 8,
+                                    textColor: grayDark
+                                },
+                                alternateRowStyles: {
+                                    fillColor: [240, 253, 244]
+                                },
+                                columnStyles: {
+                                    0: { cellWidth: 10, halign: 'center' },
+                                    1: { cellWidth: 80 },
+                                    2: { cellWidth: 35 },
+                                    3: { cellWidth: 40 }
+                                }
+                            });
+                            
+                            yPos = pdf.lastAutoTable.finalY + 12;
+                        }
+                    }
+                    
+                    // ============ RECURSOS ADJUNTOS ============
+                    if (p.privateFiles && p.privateFiles.length > 0) {
+                        checkNewPage(40);
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.setFontSize(12);
+                        pdf.setTextColor(...tecBlue);
+                        pdf.text('Recursos Adjuntos', margin, yPos);
+                        yPos += 10;
+                        
+                        const filesData = p.privateFiles.map((file, idx) => {
+                            const size = file.size ? (file.size / 1024).toFixed(1) + ' KB' : 'N/A';
+                            const ext = file.name.split('.').pop().toUpperCase();
+                            return [
+                                (idx + 1).toString(),
+                                file.name,
+                                ext,
+                                size
+                            ];
+                        });
+                        
+                        pdf.autoTable({
+                            startY: yPos,
+                            head: [['#', 'Archivo', 'Tipo', 'Tamaño']],
+                            body: filesData,
+                            margin: { left: margin, right: margin },
+                            headStyles: { 
+                                fillColor: tecGold,
+                                textColor: [255, 255, 255],
+                                fontStyle: 'bold',
+                                fontSize: 9
+                            },
+                            bodyStyles: {
+                                fontSize: 8,
+                                textColor: grayDark
+                            },
+                            alternateRowStyles: {
+                                fillColor: [255, 251, 235]
+                            },
+                            columnStyles: {
+                                0: { cellWidth: 10, halign: 'center' },
+                                1: { cellWidth: 100 },
+                                2: { cellWidth: 25, halign: 'center' },
+                                3: { cellWidth: 30, halign: 'right' }
+                            }
+                        });
+                        
+                        yPos = pdf.lastAutoTable.finalY + 12;
+                    }
+                    
+                    // ============ REPOSITORIO ============
+                    if (p.link) {
+                        checkNewPage(25);
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.setFontSize(12);
+                        pdf.setTextColor(...tecBlue);
+                        pdf.text('Repositorio', margin, yPos);
+                        yPos += 7;
+                        
+                        pdf.setFont('helvetica', 'normal');
+                        pdf.setFontSize(9);
+                        pdf.setTextColor(59, 130, 246); // Blue link color
+                        pdf.textWithLink(p.link, margin, yPos, { url: p.link });
+                        yPos += 12;
+                    }
+                    
+                    // ============ GALERÍA ============
+                    if (p.galleryUrl) {
+                        checkNewPage(25);
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.setFontSize(12);
+                        pdf.setTextColor(...tecBlue);
+                        pdf.text('Galería de Fotos', margin, yPos);
+                        yPos += 7;
+                        
+                        pdf.setFont('helvetica', 'normal');
+                        pdf.setFontSize(9);
+                        pdf.setTextColor(59, 130, 246);
+                        pdf.textWithLink(p.galleryUrl, margin, yPos, { url: p.galleryUrl });
+                        yPos += 12;
+                    }
+                    
+                    // ============ NOTAS PRIVADAS ============
+                    if (p.privateNotes && p.privateNotes.trim().length > 0) {
+                        checkNewPage(40);
+                        pdf.setFont('helvetica', 'bold');
+                        pdf.setFontSize(12);
+                        pdf.setTextColor(...tecBlue);
+                        pdf.text('Notas del Equipo', margin, yPos);
+                        yPos += 7;
+                        
+                        pdf.setFillColor(250, 245, 255);
+                        const notesLines = pdf.splitTextToSize(p.privateNotes, pageWidth - margin * 2 - 10);
+                        const notesHeight = Math.min(notesLines.length * 5 + 10, 60);
+                        pdf.roundedRect(margin, yPos, pageWidth - margin * 2, notesHeight, 2, 2, 'F');
+                        
+                        pdf.setFont('helvetica', 'normal');
+                        pdf.setFontSize(9);
+                        pdf.setTextColor(...grayDark);
+                        
+                        let noteY = yPos + 7;
+                        notesLines.slice(0, 10).forEach(line => {
+                            if (noteY < yPos + notesHeight - 3) {
+                                pdf.text(line, margin + 5, noteY);
+                                noteY += 5;
+                            }
+                        });
+                        if (notesLines.length > 10) {
+                            pdf.text('...', margin + 5, noteY);
+                        }
+                        yPos += notesHeight + 10;
+                    }
+                    
+                    // ============ PIE DE PÁGINA EN TODAS LAS PÁGINAS ============
+                    const totalPages = pdf.internal.getNumberOfPages();
+                    for (let i = 1; i <= totalPages; i++) {
+                        pdf.setPage(i);
+                        
+                        // Línea del footer
+                        pdf.setDrawColor(...grayLight);
+                        pdf.setLineWidth(0.3);
+                        pdf.line(margin, pageHeight - 20, pageWidth - margin, pageHeight - 20);
+                        
+                        // Texto del footer
+                        pdf.setFont('helvetica', 'normal');
+                        pdf.setFontSize(8);
+                        pdf.setTextColor(...grayLight);
+                        pdf.text('CRAI - Club de Robótica e Ingeniería Avanzada | TecNM Campus Mexicali', margin, pageHeight - 14);
+                        pdf.text(`Página ${i} de ${totalPages}`, pageWidth - margin, pageHeight - 14, { align: 'right' });
+                        pdf.text('Este documento es confidencial y para uso exclusivo de miembros del club.', margin, pageHeight - 9);
+                    }
+                    
+                    // Guardar PDF
+                    const fileName = `Reporte_${(p.title || 'Proyecto').replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().slice(0,10)}.pdf`;
+                    pdf.save(fileName);
+                    
+                    Util.notify("Reporte PDF generado exitosamente", "success");
+                    
+                } catch (e) {
+                    console.error('Error generando PDF:', e);
+                    Util.notify("Error al generar el reporte PDF", "error");
+                }
+            },
+
             // Mostrar detalle de proyecto
             showProjectDetail: async (projectId) => {
                 try {
@@ -10408,15 +10850,24 @@
                                         ${tasksSection}
                                         
                                         <!-- Footer -->
-                                        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-100">
-                                            <div class="flex items-center gap-2 text-slate-400 order-2 sm:order-1">
-                                                <i data-lucide="shield-check" class="w-4 h-4"></i>
-                                                <span class="text-[10px] sm:text-xs">Proyecto verificado CRAI</span>
-                                            </div>
-                                            <button onclick="Swal.close(); Router.to('public-projects')" class="w-full sm:w-auto px-4 py-2.5 bg-slate-100 hover:bg-tec-blue hover:text-white text-slate-600 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 order-1 sm:order-2 active:scale-[0.98]">
-                                                Explorar más proyectos
-                                                <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                        <div class="flex flex-col gap-3 pt-4 border-t border-slate-100">
+                                            ${isLoggedIn ? `
+                                            <!-- Botón de Generar Reporte PDF (Solo Miembros) -->
+                                            <button onclick="Database.generateProjectPDF('${projectId}')" class="w-full py-3 bg-gradient-to-r from-red-500 to-rose-600 text-white rounded-xl text-sm font-bold transition-all hover:shadow-lg hover:shadow-red-500/30 flex items-center justify-center gap-2 active:scale-[0.98]">
+                                                <i data-lucide="file-text" class="w-5 h-5"></i>
+                                                Generar Reporte Técnico PDF
                                             </button>
+                                            ` : ''}
+                                            <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+                                                <div class="flex items-center gap-2 text-slate-400 order-2 sm:order-1">
+                                                    <i data-lucide="shield-check" class="w-4 h-4"></i>
+                                                    <span class="text-[10px] sm:text-xs">Proyecto verificado CRAI</span>
+                                                </div>
+                                                <button onclick="Swal.close(); Router.to('public-projects')" class="w-full sm:w-auto px-4 py-2.5 bg-slate-100 hover:bg-tec-blue hover:text-white text-slate-600 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1 order-1 sm:order-2 active:scale-[0.98]">
+                                                    Explorar más proyectos
+                                                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                                </button>
+                                            </div>
                                         </div>
                                         
                                         <!-- Espaciado inferior para iOS safe area -->
