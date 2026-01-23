@@ -4704,36 +4704,152 @@
         <!-- ==============================
              VISTA: RECURSOS
              ============================== -->
-        <section id="view-resources" class="view-section hidden py-20 bg-slate-50 min-h-screen">
-            <div class="container mx-auto px-6">
-                <div class="text-center mb-12">
-                    <h2 class="text-4xl font-black text-tec-dark mb-4">Repositorio de Recursos</h2>
-                    <p class="text-slate-500 max-w-2xl mx-auto">Documentación, tutoriales, archivos y materiales compartidos por los miembros del club.</p>
+        <section id="view-resources" class="view-section hidden min-h-screen bg-gradient-to-b from-slate-100 via-white to-slate-50">
+            <!-- Hero destacado para Recursos -->
+            <div class="relative bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 py-16 overflow-hidden">
+                <!-- Decoración de fondo -->
+                <div class="absolute inset-0">
+                    <div class="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
+                    <div class="absolute bottom-0 left-0 w-80 h-80 bg-yellow-300/20 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl"></div>
+                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] opacity-20">
+                        <svg viewBox="0 0 200 200" class="w-full h-full">
+                            <defs>
+                                <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                                    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="white" stroke-width="0.5"/>
+                                </pattern>
+                            </defs>
+                            <rect width="100%" height="100%" fill="url(#grid)" />
+                        </svg>
+                    </div>
                 </div>
+                <div class="container mx-auto px-6 relative z-10">
+                    <div class="max-w-4xl mx-auto text-center">
+                        <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur rounded-full text-white text-xs font-bold mb-6">
+                            <i data-lucide="library" class="w-4 h-4"></i>
+                            Conocimiento Compartido
+                        </div>
+                        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight">
+                            Repositorio de
+                            <span class="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">Recursos</span>
+                        </h1>
+                        <p class="text-lg text-white/80 max-w-2xl mx-auto mb-8">Documentación, tutoriales, archivos y materiales compartidos por los miembros del club. Organiza, aprende y colabora.</p>
+                        <div class="flex flex-wrap justify-center gap-4">
+                            <div class="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-xl text-white/90 text-sm">
+                                <i data-lucide="file-text" class="w-4 h-4"></i>
+                                <span>Documentos</span>
+                            </div>
+                            <div class="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-xl text-white/90 text-sm">
+                                <i data-lucide="code" class="w-4 h-4"></i>
+                                <span>Código</span>
+                            </div>
+                            <div class="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-xl text-white/90 text-sm">
+                                <i data-lucide="book-open" class="w-4 h-4"></i>
+                                <span>Tutoriales</span>
+                            </div>
+                            <div class="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-xl text-white/90 text-sm">
+                                <i data-lucide="pen-tool" class="w-4 h-4"></i>
+                                <span>Diseños CAD</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Wave decorativo -->
+                <div class="absolute bottom-0 left-0 right-0">
+                    <svg viewBox="0 0 1440 60" class="w-full h-auto fill-slate-100">
+                        <path d="M0,60 L0,20 Q360,60 720,20 T1440,20 L1440,60 Z"></path>
+                    </svg>
+                </div>
+            </div>
+            
+            <div class="container mx-auto px-6 py-8 -mt-4">
 
-                <!-- Botón para subir recurso (solo usuarios autenticados) -->
-                <div id="resources-upload-btn" class="hidden mb-8 text-center">
-                    <button onclick="Modal.open('resource-upload')" class="inline-flex items-center gap-2 px-6 py-3 bg-tec-blue text-white rounded-xl font-bold text-sm hover:bg-tec-dark transition">
-                        <i data-lucide="plus-circle" class="w-5 h-5"></i>
-                        Subir Nuevo Recurso
-                    </button>
+                <!-- Barra de acciones y navegación -->
+                <div id="resources-toolbar" class="bg-white rounded-2xl shadow-lg border border-slate-200/50 p-5 mb-8 backdrop-blur-sm">
+                    <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+                        <!-- Breadcrumb / Navegación -->
+                        <div id="resources-breadcrumb" class="flex items-center gap-2 text-sm">
+                            <button onclick="Resources.goToRoot()" class="flex items-center gap-1.5 text-indigo-600 hover:text-indigo-800 font-bold transition">
+                                <i data-lucide="home" class="w-4 h-4"></i>
+                                Inicio
+                            </button>
+                        </div>
+                        
+                        <!-- Botones de acción (solo usuarios autenticados) -->
+                        <div id="resources-actions" class="hidden flex-wrap gap-3 justify-center">
+                            <button onclick="Modal.open('create-folder')" class="group inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-amber-400 to-yellow-500 text-white rounded-xl font-bold text-sm shadow-lg shadow-amber-200/50 hover:shadow-amber-300/50 hover:scale-105 transition-all duration-300">
+                                <i data-lucide="folder-plus" class="w-5 h-5 group-hover:rotate-12 transition-transform"></i>
+                                Nueva Carpeta
+                            </button>
+                            <button onclick="Modal.open('resource-upload')" class="group inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-indigo-200/50 hover:shadow-indigo-300/50 hover:scale-105 transition-all duration-300">
+                                <i data-lucide="upload" class="w-5 h-5 group-hover:-translate-y-0.5 transition-transform"></i>
+                                Subir Recurso
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Filtros -->
                 <div class="flex flex-wrap gap-2 justify-center mb-8">
-                    <button onclick="Resources.filter('all')" class="resource-filter active px-4 py-2 rounded-full text-xs font-bold bg-tec-blue text-white" data-filter="all">Todos</button>
-                    <button onclick="Resources.filter('documento')" class="resource-filter px-4 py-2 rounded-full text-xs font-bold bg-slate-200 text-slate-600 hover:bg-tec-blue hover:text-white transition" data-filter="documento">Documentos</button>
-                    <button onclick="Resources.filter('tutorial')" class="resource-filter px-4 py-2 rounded-full text-xs font-bold bg-slate-200 text-slate-600 hover:bg-tec-blue hover:text-white transition" data-filter="tutorial">Tutoriales</button>
-                    <button onclick="Resources.filter('codigo')" class="resource-filter px-4 py-2 rounded-full text-xs font-bold bg-slate-200 text-slate-600 hover:bg-tec-blue hover:text-white transition" data-filter="codigo">Código</button>
-                    <button onclick="Resources.filter('diseno')" class="resource-filter px-4 py-2 rounded-full text-xs font-bold bg-slate-200 text-slate-600 hover:bg-tec-blue hover:text-white transition" data-filter="diseno">Diseños CAD</button>
-                    <button onclick="Resources.filter('otro')" class="resource-filter px-4 py-2 rounded-full text-xs font-bold bg-slate-200 text-slate-600 hover:bg-tec-blue hover:text-white transition" data-filter="otro">Otros</button>
+                    <button onclick="Resources.filter('all')" class="resource-filter active px-5 py-2.5 rounded-full text-sm font-bold bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md" data-filter="all">
+                        <span class="flex items-center gap-2"><i data-lucide="grid" class="w-4 h-4"></i> Todos</span>
+                    </button>
+                    <button onclick="Resources.filter('documento')" class="resource-filter px-5 py-2.5 rounded-full text-sm font-bold bg-white text-slate-600 border-2 border-slate-200 hover:border-indigo-400 hover:text-indigo-600 transition-all" data-filter="documento">
+                        <span class="flex items-center gap-2"><i data-lucide="file-text" class="w-4 h-4"></i> Documentos</span>
+                    </button>
+                    <button onclick="Resources.filter('tutorial')" class="resource-filter px-5 py-2.5 rounded-full text-sm font-bold bg-white text-slate-600 border-2 border-slate-200 hover:border-indigo-400 hover:text-indigo-600 transition-all" data-filter="tutorial">
+                        <span class="flex items-center gap-2"><i data-lucide="book-open" class="w-4 h-4"></i> Tutoriales</span>
+                    </button>
+                    <button onclick="Resources.filter('codigo')" class="resource-filter px-5 py-2.5 rounded-full text-sm font-bold bg-white text-slate-600 border-2 border-slate-200 hover:border-indigo-400 hover:text-indigo-600 transition-all" data-filter="codigo">
+                        <span class="flex items-center gap-2"><i data-lucide="code" class="w-4 h-4"></i> Código</span>
+                    </button>
+                    <button onclick="Resources.filter('diseno')" class="resource-filter px-5 py-2.5 rounded-full text-sm font-bold bg-white text-slate-600 border-2 border-slate-200 hover:border-indigo-400 hover:text-indigo-600 transition-all" data-filter="diseno">
+                        <span class="flex items-center gap-2"><i data-lucide="pen-tool" class="w-4 h-4"></i> Diseños CAD</span>
+                    </button>
+                    <button onclick="Resources.filter('otro')" class="resource-filter px-5 py-2.5 rounded-full text-sm font-bold bg-white text-slate-600 border-2 border-slate-200 hover:border-indigo-400 hover:text-indigo-600 transition-all" data-filter="otro">
+                        <span class="flex items-center gap-2"><i data-lucide="package" class="w-4 h-4"></i> Otros</span>
+                    </button>
+                </div>
+
+                <!-- Título de carpetas -->
+                <div id="folders-section-title" class="hidden mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-xl flex items-center justify-center shadow-lg shadow-amber-200/50">
+                            <i data-lucide="folders" class="w-5 h-5 text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-black text-slate-800">Carpetas de Proyectos</h3>
+                            <p class="text-sm text-slate-400">Organiza tus recursos por proyecto o tema</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grid de Carpetas -->
+                <div id="folders-grid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 mb-10">
+                    <!-- Las carpetas se renderizan dinámicamente -->
+                </div>
+
+                <!-- Header de carpeta actual (cuando estamos dentro de una) -->
+                <div id="current-folder-header" class="hidden">
+                    <!-- Se renderiza dinámicamente -->
+                </div>
+
+                <!-- Separador cuando hay carpetas y recursos -->
+                <div id="resources-separator" class="hidden flex items-center gap-4 mb-8">
+                    <div class="flex-1 h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent"></div>
+                    <div class="flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm border border-slate-200">
+                        <i data-lucide="file-stack" class="w-4 h-4 text-indigo-500"></i>
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Todos los Recursos</span>
+                    </div>
+                    <div class="flex-1 h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent"></div>
                 </div>
 
                 <!-- Grid de Recursos -->
-                <div id="resources-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div class="col-span-full text-center py-12">
-                        <i data-lucide="folder-open" class="w-16 h-16 text-slate-300 mx-auto mb-4"></i>
-                        <p class="text-slate-400">Cargando recursos...</p>
+                <div id="resources-grid" class="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                    <div class="col-span-full text-center py-16">
+                        <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-3xl mb-6">
+                            <i data-lucide="folder-open" class="w-10 h-10 text-indigo-400"></i>
+                        </div>
+                        <p class="text-slate-400 text-lg">Cargando recursos...</p>
                     </div>
                 </div>
             </div>
@@ -5756,6 +5872,128 @@
 
     </main> <!-- FIN DEL APP-ROOT / MAIN SPA -->
 
+    <!-- MODAL: Crear Carpeta -->
+    <div id="modal-create-folder" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-fade-in">
+            <div class="bg-gradient-to-r from-amber-500 to-yellow-500 p-6 text-white">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xl font-bold flex items-center gap-2">
+                        <i data-lucide="folder-plus" class="w-6 h-6"></i>
+                        Nueva Carpeta
+                    </h3>
+                    <button onclick="Modal.close('create-folder')" class="text-white/70 hover:text-white">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+            <form class="p-6 space-y-4" onsubmit="Resources.createFolder(event)">
+                <div>
+                    <label class="text-xs font-bold text-slate-600 uppercase mb-1 block">Nombre de la Carpeta *</label>
+                    <input id="folder-name" type="text" required placeholder="Ej: Proyecto Robot Seguidor" class="w-full border border-slate-200 rounded-lg p-3 text-sm focus:border-amber-500 outline-none">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-600 uppercase mb-1 block">Descripción (opcional)</label>
+                    <textarea id="folder-desc" rows="2" placeholder="Breve descripción del proyecto o tema..." class="w-full border border-slate-200 rounded-lg p-3 text-sm focus:border-amber-500 outline-none resize-none"></textarea>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-600 uppercase mb-2 block">Color de la Carpeta</label>
+                    <div class="grid grid-cols-7 gap-2">
+                        <button type="button" onclick="Resources.selectFolderColor('blue')" class="folder-color-btn w-9 h-9 rounded-xl bg-gradient-to-br from-blue-400 to-blue-600 hover:scale-110 hover:shadow-lg shadow-blue-300/50 transition-all duration-200" data-color="blue" title="Azul"></button>
+                        <button type="button" onclick="Resources.selectFolderColor('indigo')" class="folder-color-btn w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-400 to-indigo-600 hover:scale-110 hover:shadow-lg shadow-indigo-300/50 transition-all duration-200" data-color="indigo" title="Índigo"></button>
+                        <button type="button" onclick="Resources.selectFolderColor('purple')" class="folder-color-btn w-9 h-9 rounded-xl bg-gradient-to-br from-purple-400 to-purple-600 hover:scale-110 hover:shadow-lg shadow-purple-300/50 transition-all duration-200" data-color="purple" title="Morado"></button>
+                        <button type="button" onclick="Resources.selectFolderColor('pink')" class="folder-color-btn w-9 h-9 rounded-xl bg-gradient-to-br from-pink-400 to-pink-600 hover:scale-110 hover:shadow-lg shadow-pink-300/50 transition-all duration-200" data-color="pink" title="Rosa"></button>
+                        <button type="button" onclick="Resources.selectFolderColor('rose')" class="folder-color-btn w-9 h-9 rounded-xl bg-gradient-to-br from-rose-400 to-rose-600 hover:scale-110 hover:shadow-lg shadow-rose-300/50 transition-all duration-200" data-color="rose" title="Rosa Fuerte"></button>
+                        <button type="button" onclick="Resources.selectFolderColor('red')" class="folder-color-btn w-9 h-9 rounded-xl bg-gradient-to-br from-red-400 to-red-600 hover:scale-110 hover:shadow-lg shadow-red-300/50 transition-all duration-200" data-color="red" title="Rojo"></button>
+                        <button type="button" onclick="Resources.selectFolderColor('orange')" class="folder-color-btn w-9 h-9 rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 hover:scale-110 hover:shadow-lg shadow-orange-300/50 transition-all duration-200" data-color="orange" title="Naranja"></button>
+                        <button type="button" onclick="Resources.selectFolderColor('amber')" class="folder-color-btn w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 hover:scale-110 hover:shadow-lg shadow-amber-300/50 transition-all duration-200" data-color="amber" title="Ámbar"></button>
+                        <button type="button" onclick="Resources.selectFolderColor('yellow')" class="folder-color-btn w-9 h-9 rounded-xl bg-gradient-to-br from-yellow-400 to-yellow-600 hover:scale-110 hover:shadow-lg shadow-yellow-300/50 transition-all duration-200" data-color="yellow" title="Amarillo"></button>
+                        <button type="button" onclick="Resources.selectFolderColor('lime')" class="folder-color-btn w-9 h-9 rounded-xl bg-gradient-to-br from-lime-400 to-lime-600 hover:scale-110 hover:shadow-lg shadow-lime-300/50 transition-all duration-200" data-color="lime" title="Lima"></button>
+                        <button type="button" onclick="Resources.selectFolderColor('green')" class="folder-color-btn w-9 h-9 rounded-xl bg-gradient-to-br from-green-400 to-green-600 hover:scale-110 hover:shadow-lg shadow-green-300/50 transition-all duration-200" data-color="green" title="Verde"></button>
+                        <button type="button" onclick="Resources.selectFolderColor('emerald')" class="folder-color-btn w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 hover:scale-110 hover:shadow-lg shadow-emerald-300/50 transition-all duration-200" data-color="emerald" title="Esmeralda"></button>
+                        <button type="button" onclick="Resources.selectFolderColor('teal')" class="folder-color-btn w-9 h-9 rounded-xl bg-gradient-to-br from-teal-400 to-teal-600 hover:scale-110 hover:shadow-lg shadow-teal-300/50 transition-all duration-200" data-color="teal" title="Verde Azulado"></button>
+                        <button type="button" onclick="Resources.selectFolderColor('cyan')" class="folder-color-btn w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-400 to-cyan-600 hover:scale-110 hover:shadow-lg shadow-cyan-300/50 transition-all duration-200" data-color="cyan" title="Cian"></button>
+                        <button type="button" onclick="Resources.selectFolderColor('slate')" class="folder-color-btn w-9 h-9 rounded-xl bg-gradient-to-br from-slate-400 to-slate-600 hover:scale-110 hover:shadow-lg shadow-slate-300/50 transition-all duration-200 ring-2 ring-slate-700 ring-offset-1" data-color="slate" title="Gris"></button>
+                    </div>
+                    <input type="hidden" id="folder-color" value="slate">
+                </div>
+                <div class="flex gap-3 pt-4">
+                    <button type="button" onclick="Modal.close('create-folder')" class="flex-1 px-4 py-3 border border-slate-200 rounded-xl font-bold text-sm text-slate-600 hover:bg-slate-50 transition">Cancelar</button>
+                    <button type="submit" class="flex-1 px-4 py-3 bg-amber-500 text-white rounded-xl font-bold text-sm hover:bg-amber-600 transition flex items-center justify-center gap-2">
+                        <i data-lucide="folder-plus" class="w-4 h-4"></i>
+                        Crear Carpeta
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: Detalle del Recurso -->
+    <div id="modal-resource-detail" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden animate-fade-in">
+            <div id="resource-detail-content">
+                <!-- Se renderiza dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Editar Carpeta -->
+    <div id="modal-edit-folder" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-fade-in">
+            <div class="bg-gradient-to-r from-slate-600 to-slate-700 p-6 text-white">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xl font-bold flex items-center gap-2">
+                        <i data-lucide="folder-edit" class="w-6 h-6"></i>
+                        Editar Carpeta
+                    </h3>
+                    <button onclick="Modal.close('edit-folder')" class="text-white/70 hover:text-white">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+            <form class="p-6 space-y-4" onsubmit="Resources.saveFolder(event)">
+                <div>
+                    <label class="text-xs font-bold text-slate-600 uppercase mb-1 block">Nombre de la Carpeta *</label>
+                    <input id="edit-folder-name" type="text" required class="w-full border border-slate-200 rounded-lg p-3 text-sm focus:border-slate-500 outline-none">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-600 uppercase mb-1 block">Descripción</label>
+                    <textarea id="edit-folder-desc" rows="2" class="w-full border border-slate-200 rounded-lg p-3 text-sm focus:border-slate-500 outline-none resize-none"></textarea>
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-600 uppercase mb-2 block">Color</label>
+                    <div class="grid grid-cols-7 gap-2">
+                        <button type="button" onclick="Resources.selectEditFolderColor('blue')" class="edit-folder-color-btn w-9 h-9 rounded-xl bg-gradient-to-br from-blue-400 to-blue-600 hover:scale-110 hover:shadow-lg shadow-blue-300/50 transition-all duration-200" data-color="blue" title="Azul"></button>
+                        <button type="button" onclick="Resources.selectEditFolderColor('indigo')" class="edit-folder-color-btn w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-400 to-indigo-600 hover:scale-110 hover:shadow-lg shadow-indigo-300/50 transition-all duration-200" data-color="indigo" title="Índigo"></button>
+                        <button type="button" onclick="Resources.selectEditFolderColor('purple')" class="edit-folder-color-btn w-9 h-9 rounded-xl bg-gradient-to-br from-purple-400 to-purple-600 hover:scale-110 hover:shadow-lg shadow-purple-300/50 transition-all duration-200" data-color="purple" title="Morado"></button>
+                        <button type="button" onclick="Resources.selectEditFolderColor('pink')" class="edit-folder-color-btn w-9 h-9 rounded-xl bg-gradient-to-br from-pink-400 to-pink-600 hover:scale-110 hover:shadow-lg shadow-pink-300/50 transition-all duration-200" data-color="pink" title="Rosa"></button>
+                        <button type="button" onclick="Resources.selectEditFolderColor('rose')" class="edit-folder-color-btn w-9 h-9 rounded-xl bg-gradient-to-br from-rose-400 to-rose-600 hover:scale-110 hover:shadow-lg shadow-rose-300/50 transition-all duration-200" data-color="rose" title="Rosa Fuerte"></button>
+                        <button type="button" onclick="Resources.selectEditFolderColor('red')" class="edit-folder-color-btn w-9 h-9 rounded-xl bg-gradient-to-br from-red-400 to-red-600 hover:scale-110 hover:shadow-lg shadow-red-300/50 transition-all duration-200" data-color="red" title="Rojo"></button>
+                        <button type="button" onclick="Resources.selectEditFolderColor('orange')" class="edit-folder-color-btn w-9 h-9 rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 hover:scale-110 hover:shadow-lg shadow-orange-300/50 transition-all duration-200" data-color="orange" title="Naranja"></button>
+                        <button type="button" onclick="Resources.selectEditFolderColor('amber')" class="edit-folder-color-btn w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 hover:scale-110 hover:shadow-lg shadow-amber-300/50 transition-all duration-200" data-color="amber" title="Ámbar"></button>
+                        <button type="button" onclick="Resources.selectEditFolderColor('yellow')" class="edit-folder-color-btn w-9 h-9 rounded-xl bg-gradient-to-br from-yellow-400 to-yellow-600 hover:scale-110 hover:shadow-lg shadow-yellow-300/50 transition-all duration-200" data-color="yellow" title="Amarillo"></button>
+                        <button type="button" onclick="Resources.selectEditFolderColor('lime')" class="edit-folder-color-btn w-9 h-9 rounded-xl bg-gradient-to-br from-lime-400 to-lime-600 hover:scale-110 hover:shadow-lg shadow-lime-300/50 transition-all duration-200" data-color="lime" title="Lima"></button>
+                        <button type="button" onclick="Resources.selectEditFolderColor('green')" class="edit-folder-color-btn w-9 h-9 rounded-xl bg-gradient-to-br from-green-400 to-green-600 hover:scale-110 hover:shadow-lg shadow-green-300/50 transition-all duration-200" data-color="green" title="Verde"></button>
+                        <button type="button" onclick="Resources.selectEditFolderColor('emerald')" class="edit-folder-color-btn w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 hover:scale-110 hover:shadow-lg shadow-emerald-300/50 transition-all duration-200" data-color="emerald" title="Esmeralda"></button>
+                        <button type="button" onclick="Resources.selectEditFolderColor('teal')" class="edit-folder-color-btn w-9 h-9 rounded-xl bg-gradient-to-br from-teal-400 to-teal-600 hover:scale-110 hover:shadow-lg shadow-teal-300/50 transition-all duration-200" data-color="teal" title="Verde Azulado"></button>
+                        <button type="button" onclick="Resources.selectEditFolderColor('cyan')" class="edit-folder-color-btn w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-400 to-cyan-600 hover:scale-110 hover:shadow-lg shadow-cyan-300/50 transition-all duration-200" data-color="cyan" title="Cian"></button>
+                        <button type="button" onclick="Resources.selectEditFolderColor('slate')" class="edit-folder-color-btn w-9 h-9 rounded-xl bg-gradient-to-br from-slate-400 to-slate-600 hover:scale-110 hover:shadow-lg shadow-slate-300/50 transition-all duration-200" data-color="slate" title="Gris"></button>
+                    </div>
+                    <input type="hidden" id="edit-folder-color" value="slate">
+                </div>
+                <div class="flex gap-3 pt-4">
+                    <button type="button" onclick="Resources.deleteFolder()" class="px-4 py-3 bg-red-100 text-red-600 rounded-xl font-bold text-sm hover:bg-red-200 transition flex items-center justify-center gap-2">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                    <button type="button" onclick="Modal.close('edit-folder')" class="flex-1 px-4 py-3 border border-slate-200 rounded-xl font-bold text-sm text-slate-600 hover:bg-slate-50 transition">Cancelar</button>
+                    <button type="submit" class="flex-1 px-4 py-3 bg-slate-700 text-white rounded-xl font-bold text-sm hover:bg-slate-800 transition flex items-center justify-center gap-2">
+                        <i data-lucide="save" class="w-4 h-4"></i>
+                        Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- MODAL: Subir Recurso -->
     <div id="modal-resource-upload" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-fade-in">
@@ -5771,6 +6009,13 @@
                 </div>
             </div>
             <form class="p-6 space-y-4" onsubmit="Resources.upload(event)">
+                <div>
+                    <label class="text-xs font-bold text-slate-600 uppercase mb-1 block">Carpeta</label>
+                    <select id="resource-folder" class="w-full border border-slate-200 rounded-lg p-3 text-sm focus:border-tec-blue outline-none">
+                        <option value="">📁 Sin carpeta (raíz)</option>
+                    </select>
+                    <p class="text-[10px] text-slate-400 mt-1">Organiza el recurso en una carpeta de proyecto</p>
+                </div>
                 <div>
                     <label class="text-xs font-bold text-slate-600 uppercase mb-1 block">Título del Recurso *</label>
                     <input id="resource-title" type="text" required placeholder="Ej: Manual de Arduino Básico" class="w-full border border-slate-200 rounded-lg p-3 text-sm focus:border-tec-blue outline-none">
@@ -5837,6 +6082,12 @@
                 </div>
             </div>
             <form class="p-6 space-y-4" onsubmit="Resources.saveEdit(event)">
+                <div>
+                    <label class="text-xs font-bold text-slate-600 uppercase mb-1 block">Carpeta</label>
+                    <select id="edit-resource-folder" class="w-full border border-slate-200 rounded-lg p-3 text-sm focus:border-amber-500 outline-none">
+                        <option value="">📁 Sin carpeta (raíz)</option>
+                    </select>
+                </div>
                 <div>
                     <label class="text-xs font-bold text-slate-600 uppercase mb-1 block">Título del Recurso *</label>
                     <input id="edit-resource-title" type="text" required placeholder="Ej: Manual de Arduino Básico" class="w-full border border-slate-200 rounded-lg p-3 text-sm focus:border-amber-500 outline-none">
@@ -16432,9 +16683,13 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeri
          */
         const Resources = {
             currentFilter: 'all',
+            currentFolder: null, // null = raíz
             allResources: [],
+            allFolders: [],
             expandedCards: new Set(),
             editingResource: null,
+            editingFolder: null,
+            selectedFolderColor: 'slate',
 
             // Información de las áreas del club con colores
             areaInfo: {
@@ -16448,27 +16703,247 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeri
 
             load: async () => {
                 const grid = document.getElementById('resources-grid');
-                const uploadBtn = document.getElementById('resources-upload-btn');
+                const foldersGrid = document.getElementById('folders-grid');
+                const actionsBtn = document.getElementById('resources-actions');
                 
-                // Mostrar botón de subir si está autenticado
-                if (STATE.currentUser && uploadBtn) {
-                    uploadBtn.classList.remove('hidden');
-                } else if (uploadBtn) {
-                    uploadBtn.classList.add('hidden');
+                // Mostrar botones de acción si está autenticado
+                if (STATE.currentUser && actionsBtn) {
+                    actionsBtn.classList.remove('hidden');
+                    actionsBtn.classList.add('flex');
+                } else if (actionsBtn) {
+                    actionsBtn.classList.add('hidden');
+                    actionsBtn.classList.remove('flex');
                 }
 
-                if (!grid) return;
-                grid.innerHTML = '<div class="col-span-full text-center py-12"><div class="animate-spin w-8 h-8 border-4 border-tec-blue border-t-transparent rounded-full mx-auto mb-4"></div><p class="text-slate-400">Cargando recursos...</p></div>';
+                if (grid) grid.innerHTML = '<div class="col-span-full text-center py-12"><div class="animate-spin w-8 h-8 border-4 border-tec-blue border-t-transparent rounded-full mx-auto mb-4"></div><p class="text-slate-400">Cargando recursos...</p></div>';
+                if (foldersGrid) foldersGrid.innerHTML = '';
 
                 try {
-                    const snap = await db.collection('resources').orderBy('createdAt', 'desc').get();
-                    Resources.allResources = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    // Cargar carpetas (puede que la colección no exista aún)
+                    try {
+                        const foldersSnap = await db.collection('resource_folders').get();
+                        Resources.allFolders = foldersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        // Ordenar por nombre
+                        Resources.allFolders.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+                    } catch (folderErr) {
+                        console.log('No hay carpetas creadas aún:', folderErr);
+                        Resources.allFolders = [];
+                    }
+                    
+                    // Cargar recursos - sin orderBy para obtener TODOS los documentos
+                    // (algunos antiguos pueden tener uploadedAt en lugar de createdAt)
+                    const snap = await db.collection('resources').get();
+                    console.log('Recursos cargados:', snap.docs.length);
+                    Resources.allResources = snap.docs.map(doc => {
+                        const data = doc.data();
+                        console.log('Recurso:', doc.id, data.title);
+                        return { id: doc.id, ...data };
+                    });
+                    
+                    // Ordenar manualmente por fecha (soportando ambos campos)
+                    Resources.allResources.sort((a, b) => {
+                        const dateA = a.createdAt?.toDate?.() || a.uploadedAt?.toDate?.() || new Date(0);
+                        const dateB = b.createdAt?.toDate?.() || b.uploadedAt?.toDate?.() || new Date(0);
+                        return dateB - dateA; // Más recientes primero
+                    });
+                    
+                    Resources.updateFolderSelects();
                     Resources.render();
                 } catch (err) {
                     console.error('Error cargando recursos:', err);
-                    grid.innerHTML = '<div class="col-span-full text-center py-12"><i data-lucide="alert-circle" class="w-12 h-12 text-red-300 mx-auto mb-4"></i><p class="text-slate-400">Error al cargar recursos</p></div>';
-                    lucide.createIcons();
+                    if (grid) {
+                        grid.innerHTML = '<div class="col-span-full text-center py-12"><i data-lucide="alert-circle" class="w-12 h-12 text-red-300 mx-auto mb-4"></i><p class="text-slate-400">Error al cargar recursos</p></div>';
+                        lucide.createIcons();
+                    }
                 }
+            },
+
+            updateFolderSelects: () => {
+                const selects = ['resource-folder', 'edit-resource-folder'];
+                selects.forEach(selectId => {
+                    const select = document.getElementById(selectId);
+                    if (!select) return;
+                    
+                    // Mantener el valor seleccionado
+                    const currentValue = select.value;
+                    
+                    select.innerHTML = '<option value="">📁 Sin carpeta (raíz)</option>';
+                    Resources.allFolders.forEach(folder => {
+                        select.innerHTML += `<option value="${folder.id}">📂 ${folder.name}</option>`;
+                    });
+                    
+                    // Restaurar selección
+                    if (currentValue) select.value = currentValue;
+                });
+            },
+
+            goToRoot: () => {
+                Resources.currentFolder = null;
+                Resources.render();
+            },
+
+            openFolder: (folderId) => {
+                Resources.currentFolder = folderId;
+                Resources.render();
+            },
+
+            renderBreadcrumb: () => {
+                const breadcrumb = document.getElementById('resources-breadcrumb');
+                if (!breadcrumb) return;
+                
+                let html = `
+                    <button onclick="Resources.goToRoot()" class="flex items-center gap-2 px-3 py-1.5 rounded-lg ${Resources.currentFolder ? 'text-indigo-600 hover:bg-indigo-50' : 'bg-indigo-100 text-indigo-700'} font-bold transition-all">
+                        <i data-lucide="home" class="w-4 h-4"></i>
+                        Inicio
+                    </button>
+                `;
+                
+                if (Resources.currentFolder) {
+                    const folder = Resources.allFolders.find(f => f.id === Resources.currentFolder);
+                    if (folder) {
+                        const color = folder.color || 'slate';
+                        html += `
+                            <i data-lucide="chevron-right" class="w-5 h-5 text-slate-300"></i>
+                            <span class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-${color}-100 text-${color}-700 font-bold">
+                                <i data-lucide="folder-open" class="w-4 h-4"></i>
+                                ${folder.name}
+                            </span>
+                        `;
+                    }
+                }
+                
+                breadcrumb.innerHTML = html;
+                lucide.createIcons();
+            },
+
+            renderFolders: () => {
+                const grid = document.getElementById('folders-grid');
+                const sectionTitle = document.getElementById('folders-section-title');
+                if (!grid) return;
+                
+                // Solo mostrar carpetas en la raíz
+                if (Resources.currentFolder) {
+                    grid.innerHTML = '';
+                    grid.classList.add('hidden');
+                    if (sectionTitle) sectionTitle.classList.add('hidden');
+                    return;
+                }
+                
+                if (Resources.allFolders.length === 0) {
+                    grid.innerHTML = '';
+                    grid.classList.add('hidden');
+                    if (sectionTitle) sectionTitle.classList.add('hidden');
+                    return;
+                }
+                
+                grid.classList.remove('hidden');
+                if (sectionTitle) sectionTitle.classList.remove('hidden');
+                
+                grid.innerHTML = Resources.allFolders.map(folder => {
+                    const color = folder.color || 'slate';
+                    const resourceCount = Resources.allResources.filter(r => r.folderId === folder.id).length;
+                    const isOwner = STATE.currentUser && STATE.currentUser.uid === folder.authorId;
+                    
+                    return `
+                        <div class="folder-card group relative bg-gradient-to-br from-white via-${color}-50/50 to-${color}-100/30 rounded-3xl shadow-lg border-2 border-${color}-200 hover:border-${color}-400 p-6 cursor-pointer hover:shadow-2xl hover:shadow-${color}-300/40 hover:-translate-y-2 transition-all duration-300"
+                             onclick="Resources.openFolder('${folder.id}')">
+                            
+                            <!-- Botón editar - siempre visible para el dueño -->
+                            ${isOwner ? `
+                                <button onclick="event.stopPropagation(); Resources.openEditFolder('${folder.id}')" 
+                                        class="absolute top-4 right-4 p-2.5 rounded-xl bg-white shadow-lg border border-${color}-200 hover:bg-amber-50 hover:border-amber-300 text-${color}-500 hover:text-amber-600 transition-all duration-200 hover:scale-110 z-10">
+                                    <i data-lucide="settings" class="w-4 h-4"></i>
+                                </button>
+                            ` : ''}
+                            
+                            <!-- Ícono grande de carpeta -->
+                            <div class="relative mx-auto mb-5">
+                                <div class="w-24 h-24 bg-gradient-to-br from-${color}-400 via-${color}-500 to-${color}-600 rounded-3xl flex items-center justify-center shadow-2xl shadow-${color}-400/50 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+                                    <i data-lucide="folder" class="w-12 h-12 text-white drop-shadow-lg"></i>
+                                </div>
+                                <!-- Badge de cantidad -->
+                                <div class="absolute -bottom-2 -right-2 w-10 h-10 bg-white rounded-full shadow-xl flex items-center justify-center border-3 border-${color}-300">
+                                    <span class="text-sm font-black text-${color}-600">${resourceCount}</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Nombre de la carpeta -->
+                            <h4 class="font-black text-slate-800 text-base text-center mb-1 group-hover:text-${color}-700 transition-colors line-clamp-2">${folder.name}</h4>
+                            <p class="text-xs text-slate-400 text-center font-medium">${resourceCount} recurso${resourceCount !== 1 ? 's' : ''}</p>
+                            
+                            <!-- Descripción si existe -->
+                            ${folder.description ? `
+                                <p class="text-[11px] text-${color}-600/70 text-center mt-2 line-clamp-2">${folder.description}</p>
+                            ` : ''}
+                            
+                            <!-- Efecto hover -->
+                            <div class="absolute inset-0 rounded-3xl bg-gradient-to-t from-${color}-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+                        </div>
+                    `;
+                }).join('');
+                
+                lucide.createIcons();
+            },
+
+            // Renderiza el header cuando estamos dentro de una carpeta
+            renderFolderHeader: () => {
+                const container = document.getElementById('current-folder-header');
+                if (!container) return;
+                
+                if (!Resources.currentFolder) {
+                    container.innerHTML = '';
+                    container.classList.add('hidden');
+                    return;
+                }
+                
+                const folder = Resources.allFolders.find(f => f.id === Resources.currentFolder);
+                if (!folder) {
+                    container.innerHTML = '';
+                    container.classList.add('hidden');
+                    return;
+                }
+                
+                const color = folder.color || 'slate';
+                const resourceCount = Resources.allResources.filter(r => r.folderId === folder.id).length;
+                
+                container.classList.remove('hidden');
+                container.innerHTML = `
+                    <div class="bg-gradient-to-r from-${color}-500 to-${color}-600 rounded-2xl shadow-xl shadow-${color}-200/50 p-6 mb-8">
+                        <div class="flex flex-col sm:flex-row items-center gap-4">
+                            <!-- Botón Volver -->
+                            <button onclick="Resources.goToRoot()" 
+                                    class="flex items-center gap-2 px-4 py-2.5 bg-white/20 hover:bg-white/30 backdrop-blur rounded-xl text-white font-bold text-sm transition-all hover:scale-105">
+                                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                                <span>Volver a Carpetas</span>
+                            </button>
+                            
+                            <!-- Info de la carpeta -->
+                            <div class="flex-1 flex items-center gap-4">
+                                <div class="w-16 h-16 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center">
+                                    <i data-lucide="folder-open" class="w-8 h-8 text-white"></i>
+                                </div>
+                                <div class="text-white">
+                                    <h3 class="text-xl sm:text-2xl font-black">${folder.name}</h3>
+                                    <p class="text-white/80 text-sm">${resourceCount} recurso${resourceCount !== 1 ? 's' : ''} en esta carpeta</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Botón subir recurso -->
+                            ${STATE.currentUser ? `
+                                <button onclick="document.getElementById('resource-folder').value='${folder.id}'; Modal.open('resource-upload')" 
+                                        class="flex items-center gap-2 px-5 py-2.5 bg-white text-${color}-600 rounded-xl font-bold text-sm shadow-lg hover:shadow-xl hover:scale-105 transition-all">
+                                    <i data-lucide="plus" class="w-5 h-5"></i>
+                                    <span>Añadir Recurso</span>
+                                </button>
+                            ` : ''}
+                        </div>
+                        ${folder.description ? `
+                            <p class="mt-4 text-white/90 text-sm bg-white/10 rounded-xl p-3">${folder.description}</p>
+                        ` : ''}
+                    </div>
+                `;
+                
+                lucide.createIcons();
             },
 
             toggleExpand: (resourceId) => {
@@ -16481,15 +16956,45 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeri
             },
 
             render: () => {
+                // Renderizar breadcrumb y carpetas primero
+                Resources.renderBreadcrumb();
+                Resources.renderFolders();
+                Resources.renderFolderHeader(); // Nuevo: header de carpeta actual
+                
                 const grid = document.getElementById('resources-grid');
+                const separator = document.getElementById('resources-separator');
                 if (!grid) return;
 
-                const filtered = Resources.currentFilter === 'all' 
-                    ? Resources.allResources 
-                    : Resources.allResources.filter(r => r.category === Resources.currentFilter);
+                // Filtrar por carpeta actual
+                let filtered;
+                if (Resources.currentFolder) {
+                    // Dentro de una carpeta: solo mostrar recursos de esa carpeta
+                    filtered = Resources.allResources.filter(r => r.folderId === Resources.currentFolder);
+                } else {
+                    // En la raíz: mostrar TODOS los recursos (para que los antiguos sin carpeta se vean)
+                    filtered = [...Resources.allResources];
+                }
+                
+                // Luego filtrar por categoría
+                if (Resources.currentFilter !== 'all') {
+                    filtered = filtered.filter(r => r.category === Resources.currentFilter);
+                }
+                
+                // Mostrar/ocultar separador
+                const hasFolders = !Resources.currentFolder && Resources.allFolders.length > 0;
+                if (separator) {
+                    if (hasFolders && filtered.length > 0) {
+                        separator.classList.remove('hidden');
+                    } else {
+                        separator.classList.add('hidden');
+                    }
+                }
 
                 if (filtered.length === 0) {
-                    grid.innerHTML = '<div class="col-span-full text-center py-12"><i data-lucide="folder-open" class="w-16 h-16 text-slate-300 mx-auto mb-4"></i><p class="text-slate-400">No hay recursos en esta categoría</p><p class="text-xs text-slate-300 mt-1">Sé el primero en compartir algo</p></div>';
+                    const emptyMessage = Resources.currentFolder 
+                        ? 'Esta carpeta está vacía' 
+                        : 'No hay recursos en esta categoría';
+                    grid.innerHTML = `<div class="col-span-full text-center py-12"><i data-lucide="folder-open" class="w-16 h-16 text-slate-300 mx-auto mb-4"></i><p class="text-slate-400">${emptyMessage}</p><p class="text-xs text-slate-300 mt-1">Sé el primero en compartir algo</p></div>`;
                     lucide.createIcons();
                     return;
                 }
@@ -16510,127 +17015,188 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeri
                     'otro': 'Otro'
                 };
 
+                // Renderizar tarjetas compactas de recursos
                 grid.innerHTML = filtered.map(r => {
                     const icon = categoryIcons[r.category] || 'file';
-                    const categoryLabel = categoryLabels[r.category] || 'Recurso';
-                    const date = r.createdAt?.toDate?.() ? new Date(r.createdAt.toDate()).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Reciente';
                     const areaData = Resources.areaInfo[r.area] || Resources.areaInfo['general'];
-                    const isExpanded = Resources.expandedCards.has(r.id);
-                    const isOwner = STATE.currentUser && STATE.currentUser.uid === r.authorId;
-                    const hasDetails = r.details && r.details.trim().length > 0;
-                    const hasMoreContent = hasDetails || (r.description && r.description.length > 80);
+                    const folder = r.folderId ? Resources.allFolders.find(f => f.id === r.folderId) : null;
                     
                     return `
-                        <div class="resource-card group relative bg-white rounded-2xl overflow-hidden transition-all duration-300 ${isExpanded ? 'shadow-xl ring-2 ring-${areaData.color}-200' : 'shadow-sm hover:shadow-xl hover:-translate-y-1'} cursor-pointer" 
-                             data-category="${r.category}" data-area="${r.area || 'general'}"
-                             onclick="Resources.toggleExpand('${r.id}')">
+                        <div class="resource-card group relative bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden cursor-pointer hover:shadow-xl hover:-translate-y-1 hover:border-${areaData.color}-300 transition-all duration-300"
+                             onclick="Resources.openResourceDetail('${r.id}')">
                             
-                            <!-- Barra superior con gradiente del área -->
-                            <div class="h-1.5 bg-gradient-to-r from-${areaData.color}-400 via-${areaData.color}-500 to-${areaData.color}-600"></div>
+                            <!-- Barra de color superior -->
+                            <div class="h-1 bg-gradient-to-r from-${areaData.color}-400 to-${areaData.color}-600"></div>
                             
-                            <!-- Contenido principal -->
-                            <div class="p-5">
-                                <!-- Header: Ícono + Título + Badge -->
-                                <div class="flex items-start gap-4 mb-4">
-                                    <div class="relative">
-                                        <div class="w-14 h-14 bg-gradient-to-br from-${areaData.color}-100 to-${areaData.color}-50 rounded-2xl flex items-center justify-center shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all duration-300">
-                                            <i data-lucide="${icon}" class="w-7 h-7 text-${areaData.color}-500"></i>
-                                        </div>
-                                        <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-white rounded-full shadow flex items-center justify-center">
-                                            <i data-lucide="${areaData.icon}" class="w-3 h-3 text-${areaData.color}-500"></i>
-                                        </div>
+                            <!-- Contenido compacto -->
+                            <div class="p-4">
+                                <!-- Ícono y título -->
+                                <div class="flex items-start gap-3 mb-3">
+                                    <div class="w-10 h-10 bg-gradient-to-br from-${areaData.color}-100 to-${areaData.color}-50 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                                        <i data-lucide="${icon}" class="w-5 h-5 text-${areaData.color}-500"></i>
                                     </div>
                                     <div class="flex-1 min-w-0">
-                                        <h4 class="font-bold text-slate-800 text-base leading-tight mb-2 group-hover:text-${areaData.color}-600 transition-colors">${r.title}</h4>
-                                        <div class="flex flex-wrap items-center gap-2">
-                                            <span class="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full bg-${areaData.color}-100 text-${areaData.color}-700">
-                                                <i data-lucide="${areaData.icon}" class="w-2.5 h-2.5"></i>
-                                                ${areaData.name}
-                                            </span>
-                                            <span class="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">
-                                                ${categoryLabel}
-                                            </span>
-                                        </div>
+                                        <h4 class="font-bold text-slate-800 text-sm leading-snug group-hover:text-${areaData.color}-600 transition-colors">${r.title}</h4>
+                                        <span class="inline-flex items-center gap-1 text-[9px] font-bold px-2 py-0.5 rounded-full bg-${areaData.color}-100 text-${areaData.color}-700 mt-1">
+                                            ${areaData.name}
+                                        </span>
                                     </div>
-                                    ${isOwner ? `
-                                        <button onclick="event.stopPropagation(); Resources.openEdit('${r.id}')" 
-                                                class="opacity-0 group-hover:opacity-100 p-2 rounded-xl bg-slate-100 hover:bg-amber-100 text-slate-400 hover:text-amber-600 transition-all duration-200" 
-                                                title="Editar recurso">
-                                            <i data-lucide="edit-2" class="w-4 h-4"></i>
-                                        </button>
-                                    ` : ''}
                                 </div>
                                 
-                                <!-- Descripción -->
-                                ${r.description ? `
-                                    <p class="text-sm text-slate-600 leading-relaxed ${isExpanded ? '' : 'line-clamp-2'}">${r.description}</p>
+                                <!-- Indicador de carpeta (solo en raíz) -->
+                                ${!Resources.currentFolder && folder ? `
+                                    <div class="flex items-center gap-1.5 text-[10px] text-${folder.color || 'slate'}-500 mb-2">
+                                        <i data-lucide="folder" class="w-3 h-3"></i>
+                                        <span class="truncate">${folder.name}</span>
+                                    </div>
                                 ` : ''}
                                 
-                                <!-- Contenido expandido -->
-                                <div class="overflow-hidden transition-all duration-300 ${isExpanded ? 'max-h-[500px] opacity-100 mt-4' : 'max-h-0 opacity-0'}">
-                                    ${hasDetails ? `
-                                        <div class="bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-xl p-4 mb-4 border border-slate-100">
-                                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                                                <i data-lucide="info" class="w-3 h-3"></i>
-                                                Detalles adicionales
-                                            </p>
-                                            <p class="text-sm text-slate-600 whitespace-pre-wrap leading-relaxed">${r.details}</p>
-                                        </div>
-                                    ` : ''}
-                                    
-                                    <!-- Info cards -->
-                                    <div class="grid grid-cols-2 gap-3">
-                                        <div class="bg-slate-50 rounded-xl p-3 text-center">
-                                            <div class="w-8 h-8 bg-white rounded-lg shadow-sm flex items-center justify-center mx-auto mb-2">
-                                                <i data-lucide="user" class="w-4 h-4 text-slate-400"></i>
-                                            </div>
-                                            <p class="text-[10px] text-slate-400 uppercase tracking-wide">Autor</p>
-                                            <p class="text-xs font-bold text-slate-700 truncate">${r.authorName || 'Anónimo'}</p>
-                                        </div>
-                                        <div class="bg-slate-50 rounded-xl p-3 text-center">
-                                            <div class="w-8 h-8 bg-white rounded-lg shadow-sm flex items-center justify-center mx-auto mb-2">
-                                                <i data-lucide="calendar" class="w-4 h-4 text-slate-400"></i>
-                                            </div>
-                                            <p class="text-[10px] text-slate-400 uppercase tracking-wide">Fecha</p>
-                                            <p class="text-xs font-bold text-slate-700">${date}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Footer -->
-                                <div class="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
-                                    <div class="flex items-center gap-3 text-[11px] text-slate-400">
-                                        <span class="flex items-center gap-1">
-                                            <i data-lucide="user" class="w-3.5 h-3.5"></i>
-                                            ${r.authorName || 'Anónimo'}
-                                        </span>
-                                        <span class="w-1 h-1 rounded-full bg-slate-300"></span>
-                                        <span class="flex items-center gap-1">
-                                            <i data-lucide="clock" class="w-3.5 h-3.5"></i>
-                                            ${date}
-                                        </span>
-                                    </div>
-                                    ${hasMoreContent ? `
-                                        <div class="flex items-center gap-1 text-xs font-semibold text-${areaData.color}-500">
-                                            <span>${isExpanded ? 'Ver menos' : 'Ver más'}</span>
-                                            <i data-lucide="${isExpanded ? 'chevron-up' : 'chevron-down'}" class="w-4 h-4 transition-transform"></i>
-                                        </div>
-                                    ` : ''}
+                                <!-- Botón ver detalles -->
+                                <div class="flex items-center justify-center gap-1.5 py-2 bg-slate-50 rounded-xl text-xs font-bold text-slate-500 group-hover:bg-${areaData.color}-50 group-hover:text-${areaData.color}-600 transition-all">
+                                    <i data-lucide="expand" class="w-3.5 h-3.5"></i>
+                                    <span>Ver detalles</span>
                                 </div>
                             </div>
-                            
-                            <!-- Botón de acción -->
-                            <a href="${r.url}" target="_blank" rel="noopener" 
-                               onclick="event.stopPropagation()"
-                               class="flex items-center justify-center gap-2 py-3.5 bg-gradient-to-r from-${areaData.color}-500 to-${areaData.color}-600 text-white text-sm font-bold uppercase tracking-wider hover:from-${areaData.color}-600 hover:to-${areaData.color}-700 transition-all duration-300">
-                                <i data-lucide="external-link" class="w-4 h-4"></i>
-                                Abrir Recurso
-                            </a>
                         </div>
                     `;
                 }).join('');
 
                 lucide.createIcons();
+            },
+
+            // Abrir modal con detalles del recurso
+            openResourceDetail: (resourceId) => {
+                const r = Resources.allResources.find(res => res.id === resourceId);
+                if (!r) return;
+                
+                const categoryIcons = {
+                    'documento': 'file-text',
+                    'tutorial': 'book-open',
+                    'codigo': 'code',
+                    'diseno': 'pen-tool',
+                    'otro': 'package'
+                };
+                
+                const categoryLabels = {
+                    'documento': 'Documento',
+                    'tutorial': 'Tutorial',
+                    'codigo': 'Código',
+                    'diseno': 'Diseño CAD',
+                    'otro': 'Otro'
+                };
+                
+                const icon = categoryIcons[r.category] || 'file';
+                const categoryLabel = categoryLabels[r.category] || 'Recurso';
+                const dateObj = r.createdAt?.toDate?.() || r.uploadedAt?.toDate?.() || null;
+                const date = dateObj ? new Date(dateObj).toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Fecha desconocida';
+                const areaData = Resources.areaInfo[r.area] || Resources.areaInfo['general'];
+                const authorName = r.authorName || r.uploaderName || 'Anónimo';
+                const folder = r.folderId ? Resources.allFolders.find(f => f.id === r.folderId) : null;
+                const isOwner = STATE.currentUser && (STATE.currentUser.uid === r.authorId || STATE.currentUser.uid === r.uploaderId);
+                
+                const modal = document.getElementById('modal-resource-detail');
+                const content = document.getElementById('resource-detail-content');
+                
+                if (!modal || !content) return;
+                
+                content.innerHTML = `
+                    <!-- Header con gradiente -->
+                    <div class="bg-gradient-to-r from-${areaData.color}-500 via-${areaData.color}-600 to-${areaData.color}-700 p-6 text-white relative overflow-hidden">
+                        <div class="absolute inset-0 opacity-20">
+                            <div class="absolute -top-10 -right-10 w-40 h-40 bg-white/20 rounded-full blur-2xl"></div>
+                            <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
+                        </div>
+                        <div class="relative z-10">
+                            <div class="flex items-start justify-between gap-4">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-16 h-16 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center">
+                                        <i data-lucide="${icon}" class="w-8 h-8 text-white"></i>
+                                    </div>
+                                    <div>
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <span class="px-2.5 py-1 bg-white/20 backdrop-blur rounded-full text-xs font-bold">${areaData.name}</span>
+                                            <span class="px-2 py-0.5 bg-white/10 rounded-full text-[10px]">${categoryLabel}</span>
+                                        </div>
+                                        <h3 class="text-xl sm:text-2xl font-black leading-tight">${r.title}</h3>
+                                    </div>
+                                </div>
+                                <button onclick="Modal.close('resource-detail')" class="p-2 hover:bg-white/20 rounded-xl transition">
+                                    <i data-lucide="x" class="w-6 h-6"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Contenido -->
+                    <div class="p-6 space-y-5 max-h-[60vh] overflow-y-auto">
+                        <!-- Carpeta -->
+                        ${folder ? `
+                            <div class="flex items-center gap-2 px-4 py-3 bg-${folder.color || 'slate'}-50 rounded-xl border border-${folder.color || 'slate'}-200">
+                                <i data-lucide="folder" class="w-5 h-5 text-${folder.color || 'slate'}-500"></i>
+                                <span class="font-bold text-${folder.color || 'slate'}-700">${folder.name}</span>
+                            </div>
+                        ` : ''}
+                        
+                        <!-- Descripción -->
+                        ${r.description ? `
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                                    <i data-lucide="align-left" class="w-4 h-4"></i>
+                                    Descripción
+                                </h4>
+                                <p class="text-slate-600 leading-relaxed">${r.description}</p>
+                            </div>
+                        ` : ''}
+                        
+                        <!-- Detalles adicionales -->
+                        ${r.details ? `
+                            <div class="bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-xl p-4 border border-slate-200">
+                                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                                    <i data-lucide="info" class="w-4 h-4"></i>
+                                    Detalles Adicionales
+                                </h4>
+                                <p class="text-slate-600 whitespace-pre-wrap leading-relaxed">${r.details}</p>
+                            </div>
+                        ` : ''}
+                        
+                        <!-- Info del autor y fecha -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-slate-50 rounded-xl p-4 text-center">
+                                <div class="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center mx-auto mb-2">
+                                    <i data-lucide="user" class="w-5 h-5 text-slate-400"></i>
+                                </div>
+                                <p class="text-[10px] text-slate-400 uppercase tracking-wide mb-1">Compartido por</p>
+                                <p class="text-sm font-bold text-slate-700">${authorName}</p>
+                            </div>
+                            <div class="bg-slate-50 rounded-xl p-4 text-center">
+                                <div class="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center mx-auto mb-2">
+                                    <i data-lucide="calendar" class="w-5 h-5 text-slate-400"></i>
+                                </div>
+                                <p class="text-[10px] text-slate-400 uppercase tracking-wide mb-1">Fecha</p>
+                                <p class="text-sm font-bold text-slate-700">${date}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Footer con acciones -->
+                    <div class="p-4 bg-slate-50 border-t border-slate-200 flex gap-3">
+                        ${isOwner ? `
+                            <button onclick="Modal.close('resource-detail'); Resources.openEdit('${r.id}')" 
+                                    class="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white border-2 border-slate-200 rounded-xl font-bold text-sm text-slate-600 hover:border-amber-300 hover:text-amber-600 transition-all">
+                                <i data-lucide="edit-2" class="w-4 h-4"></i>
+                                Editar
+                            </button>
+                        ` : ''}
+                        <a href="${r.url}" target="_blank" rel="noopener" 
+                           class="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-${areaData.color}-500 to-${areaData.color}-600 rounded-xl font-bold text-sm text-white shadow-lg shadow-${areaData.color}-200/50 hover:shadow-xl hover:scale-[1.02] transition-all">
+                            <i data-lucide="external-link" class="w-4 h-4"></i>
+                            Abrir Recurso
+                        </a>
+                    </div>
+                `;
+                
+                lucide.createIcons();
+                Modal.open('resource-detail');
             },
 
             openEdit: (resourceId) => {
@@ -16640,6 +17206,7 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeri
                 Resources.editingResource = resource;
                 
                 // Rellenar formulario de edición
+                document.getElementById('edit-resource-folder').value = resource.folderId || '';
                 document.getElementById('edit-resource-title').value = resource.title || '';
                 document.getElementById('edit-resource-desc').value = resource.description || '';
                 document.getElementById('edit-resource-category').value = resource.category || '';
@@ -16657,6 +17224,7 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeri
                 const resourceId = Resources.editingResource.id;
                 
                 const updatedData = {
+                    folderId: document.getElementById('edit-resource-folder').value || null,
                     title: document.getElementById('edit-resource-title').value.trim(),
                     description: document.getElementById('edit-resource-desc').value.trim(),
                     category: document.getElementById('edit-resource-category').value,
@@ -16711,14 +17279,14 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeri
             filter: (category) => {
                 Resources.currentFilter = category;
                 
-                // Actualizar botones de filtro
+                // Actualizar botones de filtro con nuevo estilo
                 document.querySelectorAll('.resource-filter').forEach(btn => {
                     if (btn.dataset.filter === category) {
-                        btn.classList.remove('bg-slate-200', 'text-slate-600');
-                        btn.classList.add('bg-tec-blue', 'text-white');
+                        btn.classList.remove('bg-white', 'text-slate-600', 'border-slate-200');
+                        btn.classList.add('bg-gradient-to-r', 'from-indigo-500', 'to-purple-600', 'text-white', 'shadow-md', 'border-transparent');
                     } else {
-                        btn.classList.add('bg-slate-200', 'text-slate-600');
-                        btn.classList.remove('bg-tec-blue', 'text-white');
+                        btn.classList.add('bg-white', 'text-slate-600', 'border-slate-200');
+                        btn.classList.remove('bg-gradient-to-r', 'from-indigo-500', 'to-purple-600', 'text-white', 'shadow-md', 'border-transparent');
                     }
                 });
 
@@ -16733,6 +17301,7 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeri
                     return;
                 }
 
+                const folderId = document.getElementById('resource-folder').value || null;
                 const title = document.getElementById('resource-title').value.trim();
                 const description = document.getElementById('resource-desc').value.trim();
                 const category = document.getElementById('resource-category').value;
@@ -16749,6 +17318,7 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeri
 
                 try {
                     await db.collection('resources').add({
+                        folderId,
                         title,
                         description,
                         category,
@@ -16769,6 +17339,171 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeri
                     console.error('Error subiendo recurso:', err);
                     Util.loading(false);
                     Util.notify('Error al publicar el recurso: ' + err.message, 'error');
+                }
+            },
+
+            // ========== FUNCIONES DE CARPETAS ==========
+            
+            selectFolderColor: (color) => {
+                Resources.selectedFolderColor = color;
+                document.getElementById('folder-color').value = color;
+                document.querySelectorAll('.folder-color-btn').forEach(btn => {
+                    btn.classList.remove('ring-2', 'ring-offset-1');
+                    if (btn.dataset.color === color) {
+                        btn.classList.add('ring-2', 'ring-offset-1');
+                    }
+                });
+            },
+
+            selectEditFolderColor: (color) => {
+                document.getElementById('edit-folder-color').value = color;
+                document.querySelectorAll('.edit-folder-color-btn').forEach(btn => {
+                    btn.classList.remove('ring-2', 'ring-offset-1');
+                    if (btn.dataset.color === color) {
+                        btn.classList.add('ring-2', 'ring-offset-1');
+                    }
+                });
+            },
+
+            createFolder: async (e) => {
+                e.preventDefault();
+                if (!STATE.currentUser) {
+                    Modal.close('create-folder');
+                    Modal.open('auth');
+                    return;
+                }
+
+                const name = document.getElementById('folder-name').value.trim();
+                const description = document.getElementById('folder-desc').value.trim();
+                const color = document.getElementById('folder-color').value || 'slate';
+
+                if (!name) {
+                    Util.notify('Por favor ingresa un nombre para la carpeta', 'error');
+                    return;
+                }
+
+                Util.loading(true, 'Creando carpeta...');
+
+                try {
+                    console.log('Creando carpeta:', { name, description, color });
+                    console.log('Usuario:', STATE.currentUser?.uid);
+                    
+                    const docRef = await db.collection('resource_folders').add({
+                        name,
+                        description,
+                        color,
+                        authorId: STATE.currentUser.uid,
+                        authorName: STATE.currentUser.displayName || 'Miembro CRAI',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    
+                    console.log('Carpeta creada con ID:', docRef.id);
+
+                    Util.loading(false);
+                    Modal.close('create-folder');
+                    Util.notify('Carpeta creada correctamente', 'success');
+                    
+                    // Limpiar formulario
+                    document.getElementById('folder-name').value = '';
+                    document.getElementById('folder-desc').value = '';
+                    Resources.selectFolderColor('slate');
+                    
+                    Resources.load();
+                } catch (err) {
+                    console.error('Error creando carpeta:', err);
+                    console.error('Código de error:', err.code);
+                    console.error('Mensaje:', err.message);
+                    Util.loading(false);
+                    Util.notify('Error al crear la carpeta: ' + (err.message || err.code), 'error');
+                }
+            },
+
+            openEditFolder: (folderId) => {
+                const folder = Resources.allFolders.find(f => f.id === folderId);
+                if (!folder) return;
+                
+                Resources.editingFolder = folder;
+                
+                document.getElementById('edit-folder-name').value = folder.name || '';
+                document.getElementById('edit-folder-desc').value = folder.description || '';
+                document.getElementById('edit-folder-color').value = folder.color || 'slate';
+                
+                // Marcar el color seleccionado
+                Resources.selectEditFolderColor(folder.color || 'slate');
+                
+                Modal.open('edit-folder');
+            },
+
+            saveFolder: async (e) => {
+                e.preventDefault();
+                if (!Resources.editingFolder || !STATE.currentUser) return;
+                
+                const folderId = Resources.editingFolder.id;
+                
+                const updatedData = {
+                    name: document.getElementById('edit-folder-name').value.trim(),
+                    description: document.getElementById('edit-folder-desc').value.trim(),
+                    color: document.getElementById('edit-folder-color').value || 'slate',
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                if (!updatedData.name) {
+                    Util.notify('El nombre de la carpeta es requerido', 'error');
+                    return;
+                }
+                
+                Util.loading(true, 'Guardando cambios...');
+                
+                try {
+                    await db.collection('resource_folders').doc(folderId).update(updatedData);
+                    Util.loading(false);
+                    Modal.close('edit-folder');
+                    Util.notify('Carpeta actualizada correctamente', 'success');
+                    Resources.editingFolder = null;
+                    Resources.load();
+                } catch (err) {
+                    console.error('Error actualizando carpeta:', err);
+                    Util.loading(false);
+                    Util.notify('Error al actualizar la carpeta', 'error');
+                }
+            },
+
+            deleteFolder: async () => {
+                if (!Resources.editingFolder || !STATE.currentUser) return;
+                
+                const resourcesInFolder = Resources.allResources.filter(r => r.folderId === Resources.editingFolder.id);
+                
+                let confirmMsg = '¿Estás seguro de eliminar esta carpeta?';
+                if (resourcesInFolder.length > 0) {
+                    confirmMsg = `Esta carpeta contiene ${resourcesInFolder.length} recurso(s). Si la eliminas, los recursos se moverán a la raíz. ¿Continuar?`;
+                }
+                
+                if (!confirm(confirmMsg)) return;
+                
+                Util.loading(true, 'Eliminando carpeta...');
+                
+                try {
+                    // Mover recursos a la raíz
+                    const batch = db.batch();
+                    resourcesInFolder.forEach(resource => {
+                        const ref = db.collection('resources').doc(resource.id);
+                        batch.update(ref, { folderId: null });
+                    });
+                    await batch.commit();
+                    
+                    // Eliminar la carpeta
+                    await db.collection('resource_folders').doc(Resources.editingFolder.id).delete();
+                    
+                    Util.loading(false);
+                    Modal.close('edit-folder');
+                    Util.notify('Carpeta eliminada', 'success');
+                    Resources.editingFolder = null;
+                    Resources.currentFolder = null;
+                    Resources.load();
+                } catch (err) {
+                    console.error('Error eliminando carpeta:', err);
+                    Util.loading(false);
+                    Util.notify('Error al eliminar la carpeta', 'error');
                 }
             }
         };
