@@ -10068,7 +10068,7 @@
                                     'telecom': 'Telecom',
                                     'software': 'Software',
                                     'electronica': 'Electrónica',
-                                    'mecanico': 'Mecánico'
+                                    'mecanico': 'Diseño Mecánico y Manufactura'
                                 };
                                 return [
                                     (idx + 1).toString(),
@@ -10491,7 +10491,7 @@
                             telecom: { bg: 'bg-blue-100', text: 'text-blue-700', icon: 'wifi', name: 'Telecom' },
                             software: { bg: 'bg-green-100', text: 'text-green-700', icon: 'code', name: 'Software' },
                             electronica: { bg: 'bg-orange-100', text: 'text-orange-700', icon: 'cpu', name: 'Electrónica' },
-                            mecanico: { bg: 'bg-red-100', text: 'text-red-700', icon: 'cog', name: 'Mecánico' },
+                            mecanico: { bg: 'bg-red-100', text: 'text-red-700', icon: 'cog', name: 'Diseño Mecánico y Manufactura' },
                             sin_area: { bg: 'bg-slate-100', text: 'text-slate-700', icon: 'folder', name: 'Sin área' }
                         };
                         
@@ -13447,7 +13447,7 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeri
                                     <option value="telecom" ${member.area === 'telecom' ? 'selected' : ''}>Telecomunicaciones</option>
                                     <option value="software" ${member.area === 'software' ? 'selected' : ''}>Software e IA</option>
                                     <option value="electronica" ${member.area === 'electronica' ? 'selected' : ''}>Electrónica</option>
-                                    <option value="mecanico" ${member.area === 'mecanico' ? 'selected' : ''}>Mecánico</option>
+                                    <option value="mecanico" ${member.area === 'mecanico' ? 'selected' : ''}>Diseño Mecánico y Manufactura</option>
                                 </select>
                             </div>
                             <div>
@@ -13485,7 +13485,7 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeri
                             'telecom': 'Telecomunicaciones',
                             'software': 'Software e IA',
                             'electronica': 'Electrónica',
-                            'mecanico': 'Mecánico'
+                            'mecanico': 'Diseño Mecánico y Manufactura'
                         };
                         
                         await db.collection('users').doc(memberId).update({
