@@ -14247,7 +14247,7 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeri
                     points: 700,
                     special: true,
                     secret: true, // Logro secreto
-                    type: 'auto', // Se detecta por skills legacy en perfil
+                    type: 'manual', // Solo admin puede asignar
                     reward: 'Obtienes un Marco Aero exclusivo con burbujas brillantes y efectos glossy.',
                     frameType: 'frutiger'
                 },
@@ -14859,42 +14859,6 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeri
                     autoAchievements.push('newcomer');
                 }
                 
-                // Auto-detectar NOSTALGIA DIGITAL - habilidades clásicas de ingeniería en skills
-                const skills = (user.skills || []).map(s => s.toLowerCase());
-                const legacySkills = [
-                    // Lenguajes legacy
-                    'cobol', 'fortran', 'pascal', 'delphi', 'visual basic', 'vb6', 'vb.net',
-                    'assembly', 'assembler', 'ensamblador', 'basic', 'qbasic', 'turbo pascal',
-                    'foxpro', 'clipper', 'ada', 'lisp', 'prolog', 'smalltalk',
-                    // Software CAD/CAM antiguo
-                    'autocad 2d', 'autocad r14', 'autocad 2000', 'autocad 2004', 'autocad lt',
-                    'mastercam', 'catia v4', 'pro/engineer', 'pro engineer', 'unigraphics',
-                    // Electrónica legacy
-                    'orcad', 'pspice', 'protel', 'eagle', 'multisim', 'proteus',
-                    'pic basic', 'pic16f84', 'pic16f877', 'at89c51', '8051', 'z80',
-                    'motorola 68000', '6502', 'avr studio', 'mplab',
-                    // PLCs y automatización legacy  
-                    'rslogix', 'rslogix 500', 'step 5', 'step 7', 'simatic s5',
-                    'plc-5', 'slc 500', 'micrologix', 'logo!', 'zelio',
-                    // Software legacy
-                    'labview', 'matlab 6', 'matlab 7', 'simulink', 'mathcad',
-                    'flash', 'actionscript', 'director', 'shockwave',
-                    // Herramientas
-                    'torno manual', 'fresadora manual', 'torno convencional',
-                    'dibujo técnico', 'restirador', 'rapidógrafo',
-                    // Comunicaciones legacy
-                    'rs232', 'rs485', 'rs422', 'gpib', 'paralelo', 'puerto paralelo',
-                    'modem', 'dial-up', 'bbs'
-                ];
-                
-                const hasLegacySkill = skills.some(skill => 
-                    legacySkills.some(legacy => skill.includes(legacy))
-                );
-                
-                if (hasLegacySkill && !achievements.includes('frutiger_aero')) {
-                    autoAchievements.push('frutiger_aero');
-                }
-                
                 // Los siguientes se detectan con datos adicionales que se pasan
                 // first_project, team_player, wiki_writer - se verifican en checkAutoAchievements()
                 
@@ -15022,26 +14986,6 @@ Fecha: ${new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeri
                         
                         if (hasSoftware && hasElectronics && hasMechanic) {
                             newAchievements.push('polymath');
-                            hasChanges = true;
-                        }
-                    }
-                    
-                    // 8. NOSTALGIA DIGITAL - Detectar palabras clave retro en bio o skills
-                    if (!currentAchievements.includes('frutiger_aero')) {
-                        const bio = (userData.bio || '').toLowerCase();
-                        const skills = (userData.skills || []).map(s => s.toLowerCase()).join(' ');
-                        const searchText = bio + ' ' + skills;
-                        
-                        const retroKeywords = ['retro', 'vintage', 'nostalgia', 'nostalgico', 'nostálgico', 
-                            'windows', 'vista', 'aero', 'frutiger', '2000', 'y2k', 'oldschool', 'old school',
-                            'classico', 'clásico', 'classic', 'pixel', 'vaporwave', 'retrowave', 
-                            'synthwave', 'aesthetic', 'skeuomorphism', 'glossy', 'bubble', 'burbuja',
-                            'aqua', 'gel', 'glass', 'cristal', 'xp', 'millennium', 'milenio'];
-                        
-                        const hasRetroVibes = retroKeywords.some(keyword => searchText.includes(keyword));
-                        
-                        if (hasRetroVibes) {
-                            newAchievements.push('frutiger_aero');
                             hasChanges = true;
                         }
                     }
